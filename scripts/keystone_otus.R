@@ -58,7 +58,7 @@ data <- data[filt,]
 
 
 ######CARGA DE RED Y AJUSTE A FILTRACIÓN DE OTUS######
-red <- paste0("./DataSets/", args[2])
+red <- paste0("./DataSets/networks/", args[2])
 red <- read.csv(red)
 red = red[,1:3]#se asume la forma del archivo de red
 

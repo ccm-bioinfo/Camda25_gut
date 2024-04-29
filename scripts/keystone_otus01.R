@@ -30,8 +30,8 @@ if (str_sub( data , -4 , -1) == ".csv" ){
   data <- read.table(data , row.names = 1, header = TRUE , sep = "" )  
 }
 
-
-
+#print(data)
+print(dim(data))
 
 #Normalización
 for (i in 1:dim(data)[2]){
@@ -55,13 +55,15 @@ for (i in 1:dim(data)[1]) {
 }
 
 data <- data[filt,]
-
-
+#print(data)
+print(dim(data))
 ######CARGA DE RED Y AJUSTE A FILTRACIÓN DE OTUS######
-red <- paste0("./DataSets/", args[2])
+red <- paste0("./DataSets/networks/", args[2])
 red <- read.csv(red)
 red = red[,1:3]#se asume la forma del archivo de red
+#net <- graph_from_edgelist(as.matrix(red[, 1:2]) , directed = FALSE )
 
+print(length(V(net)))
 #Dado que se han filtrado otus, solo retendremos las aristas que se refieren a los otus conservados en nuestros datos y a correlaciones positivas
 edges <- c()
 for (i in 1:dim(red)[1]) {
@@ -88,13 +90,13 @@ for (i in 1:dim(data)[1]){
   data[i,"nodos"] <- paste0("v_" , as.character(data[i,"nodos"]))
 }
 
-
+#print(data)
 ########CARGA DE RED CON igraph Y ELECCION DE COMPONENTE CONEXA PRINCIPAL##### 
 
 
 net_work <- graph_from_edgelist(as.matrix(red) , directed = FALSE )
 
-
+print(V(net_work))
 
 ##componente(s) conexa(s) principal(es)
 compo_conexas <- components(net_work)
@@ -104,23 +106,25 @@ compo_conexas <- components(net_work)
 componentes <- list()
 data_0 <- list()
 pertenencia <- compo_conexas$membership
-for (i in 1:length(compo_conexas$size)){
+
+for (i in 1:length(compo_conexas$csize)){
   compo_i <- names(which(pertenencia == i))
+  #print(compo_i)
   filtro_i <- c()
   
   for (j in 1:dim(data)[1]){
-    if(is.element(data[i,"nodos"],compo_i)){
+    if(is.element(data[j,"nodos"],compo_i)){
       filtro_i <- c(filtro_i, j)
     }
   }
-  
+  #print(filtro_i)
   data_i <- data[filtro_i,]
-  
+  #print(data_i)  
   data_0[[i]] <- data_i
-  compo_conexas[[i]] <- induced_subgraph(net_work, compo_i ,"auto")
+  componentes[[i]] <- induced_subgraph(net_work, compo_i ,"auto")
 }
 
-
+#print(componentes)
 #compo_princ <- which(pertenencia == princ )
 #compo_princ <- names(compo_princ)
 
@@ -134,7 +138,7 @@ for (i in 1:length(compo_conexas$size)){
 
 #print(dim(data))
 
-
+#print(data_0)
 
 
 degrees <- list()
@@ -183,7 +187,7 @@ for (i in 1:length(data_0)){
   data_1 <- rbind.data.frame(data_1 , data_0[[i]])
 }
 
-
+print(dim(data_1))
 
 data_deg <- data_1[order(data_1$degrees, decreasing = TRUE),]
 data_close <- data_1[order(data_1$closeness , decreasing = TRUE),]
