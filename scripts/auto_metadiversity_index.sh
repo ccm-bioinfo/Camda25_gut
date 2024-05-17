@@ -5,7 +5,7 @@
 touch MD_results.csv
 echo "SAMPLE,CONTIGS,RICHNESS,SHANNON,SIMPSON,LOG10_MD,MDI" > ./MD_results.csv
 
-for filename in /files2/camda2024/gut/faa_files/*.faa; do
+for filename in /files/camda2024/gut/prokka/*.faa; do
 	python metadiversity_index.py -i $filename -r F
 	done
 
