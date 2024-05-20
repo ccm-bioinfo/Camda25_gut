@@ -31,6 +31,11 @@ Our primary objectives for this challenge were to:
 2. Utilize the Theatre of Activity concept to improve health predictions.
 3. Document our methods, results, and insights gained during the challenge.
 
+## Requirements
+- R (4.1.3)
+- Python (3.10.5)
+
+
 ## Repository Contents
 
 ```
