@@ -15,6 +15,15 @@ For each sample, the following data is provided:
 - **Taxonomic Profiles:** Including health predictions from existing indices (Shannon Entropy, GMHI, and hiPCA).
 - **Functional Profiles:** Detailing the microbial functions present in each sample.
 
+Additionally we were provided with an additional dataset containing samples from 35 patients. The task is to explore the dataset and classify the patients into two groups: healthy controls and COVID-19 patients.
+
+Each patient has two samples:
+1. Sample from the day of admission.
+2. The last sample from the ward stay.
+
+The main objective of this challenge is to identify the healthy controls among the patients based on the provided dataset.
+
+
 ## Project Objectives
 
 Our primary objectives for this challenge were to:
