@@ -9,13 +9,11 @@
 
 
 # estableciendo ruta
-setwd("/Users/goretty/R/camda24")
-indir = "/Users/goretty/R/camda24/input/"
-outdir = "/Users/goretty/R/camda24/results/"
+outdir = "../output/MD_index/"
 pacman::p_load(ggplot2, dplyr, FSA)
 
 #leyendo los datos
-df <- read.delim("/Users/goretty/R/camda24/input/MD_results.csv", sep = ",")
+df <- read.delim("../DataSets/MD_results.csv", sep = ",")
 
 #convirtiendo a factor
 str(df)
@@ -104,6 +102,3 @@ kruskal.test(MDI ~ Group, data = df2)
 # no encontramos diferencias estadísticamente significativas entre el
 # grupo sano vs el enfermo
 
-
-
-#
