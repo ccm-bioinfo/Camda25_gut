@@ -10,8 +10,8 @@ import statisticsFunctions
 import os
 import sys
 
-if not os.path.exists('networks'):
-    os.mkdir('networks')
+# if not os.path.exists('networks'):
+#     os.mkdir('networks')
 
 np.random.seed(1)
 
@@ -48,9 +48,9 @@ network = list()
 #else:
         
 network = statisticsFunctions.CalculateMetricsParallel(rawData)
-statisticsFunctions.printNetwork(network,f"networks/{outName}_raw_network.csv")
+statisticsFunctions.printNetwork(network,f"../output/networks/{outName}_raw_network.csv")
 
-statisticsFunctions.printNetworkGephi(network,list(rawData.index),f"networks/{outName}_network")
+statisticsFunctions.printNetworkGephi(network,list(rawData.index),f"../output/networks/{outName}_network")
 
 #sys.exit()
 
@@ -60,12 +60,12 @@ print ( f"raw network: \t {finish-start}")
 
 statisticsFunctions.PermutationTest(rawData, network, numPermutations = numPermutations, reBoot = True)
 finish = datetime.datetime.now()
-statisticsFunctions.printNetwork(network,f"networks/{outName}_network_PermTest.csv")
+statisticsFunctions.printNetwork(network,f"../output/networks/{outName}_network_PermTest.csv")
 print ( f"PERMUTATION test: \t {finish-start}")
 
 
 statisticsFunctions.PermutationTest(rawData, network, bootstrap=True, numPermutations = numPermutations, reBoot = True)
 finish = datetime.datetime.now()
-statisticsFunctions.printNetwork(network,f"networks/{outName}_network_complete.csv")
+statisticsFunctions.printNetwork(network,f"../output/networks/{outName}_network_complete.csv")
 print ( f"BOOTSTRAP test: \t {finish-start}")
 
