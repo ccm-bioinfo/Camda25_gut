@@ -25,7 +25,7 @@ setwd("..")
 data <- paste0("./DataSets/", args[1])
 
 if (str_sub( data , -4 , -1) == ".csv" ){
-  data <- read.csv(data , row.names = 1 , header = TRUE)
+  data <- read.csv(data , row.names = 1 , header = TRUE , fill = TRUE)
 } else {
   data <- read.table(data , row.names = 1, header = TRUE , sep = "" )  
 }
@@ -148,6 +148,7 @@ data$betweenness <- betweenness_cent
 
 data_deg <- data[order(data$degrees, decreasing = TRUE),]
 data_close <- data[order(data$closeness , decreasing = TRUE),]
+data_close
 data_between <- data[order(data$betweenness, decreasing = TRUE),]
 
 
