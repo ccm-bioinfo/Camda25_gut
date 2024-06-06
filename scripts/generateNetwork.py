@@ -21,7 +21,7 @@ numBootstraps   = 100
 loadNetworkFlag = False
 
 
-table = pd.read_csv(sys.argv[1] , index_col = 0)
+table = pd.read_table(sys.argv[1] , index_col = 0)
 table = table.astype(float)
 table.index = table.index.astype(str)
 

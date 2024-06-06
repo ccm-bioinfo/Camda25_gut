@@ -17,20 +17,22 @@ if (!require(stringr)) install.packages('stringr')
 library(stringr)
 
 #tabla de abundancias
-data <- paste0("./DataSets/", args[1])
+data <- paste0("../DataSets/", args[1])
 data <- read.csv(data , row.names = 1 , header = TRUE , fill = TRUE)
 
 
 #red
-red <- paste0(args[2])
+red <- paste0("../output/networks/" , args[2])
 red <- read.csv(red)
 red = red[,1:3]
 
 #lista de otus a tomar en cuenta
-lista <- paste0(".DataSets/" , args[3])
-lista <- which(is.element(lista, row.names(data)))
+lista <- paste0("../DataSets/" , args[3])
+lista <- read.table(lista)
 
+lista <- which(is.element(row.names(data) , lista[ , 1]))
 
+print(lista)
 
 #se genera una etiqueta que concuerde con las de la red
 data$nodos <- 0:(dim(data)[1]-1)
@@ -78,5 +80,7 @@ compo_princ <- names(compo_princ)
 #
 data <- data[ which(is.element(data$nodos , compo_princ)) , ]
 
-write.csv(data , paste0( substr(args[3] , -4 , -1) , "_correlation.csv"))
+
+
+write.csv(data , paste0( substr(args[3] , 1 , nchar(args[3])-4 ), "_correlation.csv"))
 
