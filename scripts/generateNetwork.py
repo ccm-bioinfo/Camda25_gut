@@ -1,5 +1,5 @@
 import math
-from biom import load_table
+#from biom import load_table
 from scipy.spatial import distance
 from scipy import stats
 import pandas as pd
