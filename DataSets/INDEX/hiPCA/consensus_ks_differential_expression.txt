@@ -1,0 +1,6 @@
+species
+Erysipelatoclostridium_ramosum
+Escherichia_coli
+Lacrimispora_saccharolytica
+Ruminococcus_gnavus
+Tyzzerella_nexilis
