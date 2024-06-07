@@ -12,6 +12,7 @@
 
 # Written by Damien Finn, damien.finn@thuenen.de
 # Modified to create a csv with results instead of print them out by Luis Galvan
+# Get the latest docker image from https://hub.docker.com/r/gorettymdz/mdi
 
 import os
 import argparse
