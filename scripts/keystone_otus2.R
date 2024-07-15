@@ -86,7 +86,7 @@ for (i in 1:dim(red)[1]){
 
 nodos <- c()
 for (i in 1:dim(data)[1]){
-  nodos <- c(nodos , paste0(as.character(row.names(data)[i])))
+  nodos <- c(nodos , paste0(setas.character(row.names(data)[i])))
 }
 
 data$nodos <- nodos 
@@ -150,7 +150,7 @@ data$betweenness <- betweenness_cent
 
 data_deg <- data[order(data$degrees, decreasing = TRUE),]
 data_close <- data[order(data$closeness , decreasing = TRUE),]
-data_close
+
 data_between <- data[order(data$betweenness, decreasing = TRUE),]
 
 
