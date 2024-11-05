@@ -1,0 +1,1 @@
+from .gmhi_calculate import get_all_GMHI
