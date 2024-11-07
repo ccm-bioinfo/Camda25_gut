@@ -3,7 +3,7 @@ import pandas as pd
 from hiPCA import calculate_hiPCA
 from RF_GMHI import get_all_GMHI
 
-st.title("Analysis Tool")
+st.title("Gut Microbiome Health Calculator")
 
 # Create tabs
 tab_info, tab1, tab2 = st.tabs(["Information", "hiPCA Calculation", "GMHI Calculation"])
@@ -12,7 +12,7 @@ tab_info, tab1, tab2 = st.tabs(["Information", "hiPCA Calculation", "GMHI Calcul
 with tab_info:
     st.header("About This Tool")
     st.write("""
-        This tool provides functionalities to perform high-dimensional PCA (hiPCA) calculations
+        This tool provides functionalities to perform health index PCA (hiPCA)
         and GMHI (Gut Microbiome Health Index) calculations. Users can upload their datasets and 
         obtain analysis results based on selected models.
 
@@ -23,7 +23,7 @@ with tab_info:
 
         ### GitHub Repository
         You can find the source code and documentation on our GitHub repository: 
-        [GitHub Link](https://github.com/yourusername/yourrepository)
+        [GitHub Link](https://github.com/ccm-bioinfo/Camda25_gut)
 
         ### Usage
         - Upload your dataset in the respective tabs.
@@ -39,6 +39,18 @@ with tab_info:
     # """,
     # unsafe_allow_html=True
     # )
+
+    st.markdown('### Development')
+    dev = '- Rafael Pérez Estrada (Centro de Ciencias Matemáticas) \n- Juan Francisco Espinosa (Centro de Ciencias Matemáticas)'
+    st.markdown(dev)
+# st.markdown('- Rafael Pérez Estrada (Amphora Health)')
+# st.markdown('- Marco A. Nava Aguilar (Amphora Health)')
+
+
+    st.markdown('### Acknowledgements')
+    acknowledgements = '- Nelly Sélem Mojica (Centro de Ciencias Matemáticas) \n- Shaday Guerrero (Centro de Ciencias Matemáticas)'
+    st.markdown(acknowledgements)
+
     left_co, cent_co,last_co = st.columns(3)
     with cent_co:
         # st.image(logo)
@@ -60,7 +72,7 @@ with tab1:
         data = pd.read_csv(uploaded_file, delimiter=delimiter, index_col=0)
         
         st.write("Preview of the uploaded file:")
-        st.write(data)
+        st.write(data.head(3))
 
         models = {'CAMDA MODEL':'camda_all_samples', 'ORIGINAL MODEL (ZHU et al)':'zhu_model'}
         selected_model = st.selectbox("Select a model to use:", list(models.keys()))
@@ -98,7 +110,7 @@ with tab2:
         gmhi_data = pd.read_csv(gmhi_file, delimiter=delimiter, index_col=0)
         
         st.write("Preview of the GMHI file:")
-        st.write(gmhi_data)
+        st.write(gmhi_data.head(3))
 
         models = {'CAMDA MODEL':'RF_GMHI/model_data/taxonomy.csv', 'ORIGINAL MODEL':'RF_GMHI/model_data/taxonomy_original.csv'}
         selected_model = st.selectbox("Select a model to use:", list(models.keys()))
