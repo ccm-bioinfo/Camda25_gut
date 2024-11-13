@@ -56,3 +56,10 @@ Our primary objectives for this challenge were to:
 └── ...
 ```
 
+## Run dasboard
+
+```bash
+git clone https://github.com/ccm-bioinfo/Camda25_gut.git
+cd Camda25_gut/indexes/
+streamlit run dashboard.py
+```
