@@ -77,3 +77,16 @@ git clone https://github.com/ccm-bioinfo/Camda25_gut.git
 cd Camda25_gut/indexes/
 streamlit run dashboard.py
 ```
+
+## Running the hiPCA Index
+
+To calculate the hiPCA index, you can use either the CAMDA model or the original Zhu model. Here’s how to run the script:
+
+1. **Navigate to the hiPCA Directory**
+
+   First, move into the hiPCA directory:
+
+   ```bash
+   cd Camda25_gut/indexes/hiPCA
+   python3 hiPCA_calculate.py --path model_data/{model}/ --input path/to/input --output output/directory/
+   ```
