@@ -70,7 +70,7 @@ joblib
 └── ...
 ```
 
-## Run dasboard
+## Run dashboard
 
 ```bash
 git clone https://github.com/ccm-bioinfo/Camda25_gut.git
