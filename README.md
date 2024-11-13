@@ -35,6 +35,20 @@ Our primary objectives for this challenge were to:
 - R (4.1.3)
 - Python (3.10.5)
 
+### Python libraries
+
+To run this project, ensure you have the following Python libraries installed:
+
+```bash
+pandas
+numpy
+json
+pickle
+scipy
+scikit-learn
+joblib
+```
+
 
 ## Repository Contents
 
@@ -46,7 +60,7 @@ Our primary objectives for this challenge were to:
 │   │   └── INDEX 
 │   ├── indexes
 │   │   ├── hiPCA
-│   │   └── RFT_GMHI
+│   │   └── RF_GMHI
 │   ├── output
 │   │   ├── hiPCA
 │   │   ├── GMHI
