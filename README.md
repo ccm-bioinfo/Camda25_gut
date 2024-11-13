@@ -86,3 +86,11 @@ To calculate the hiPCA index, you can use either the CAMDA model or the original
    cd Camda25_gut/indexes/hiPCA
    python3 hiPCA_calculate.py --path model_data/{model}/ --input path/to/input --output output/directory/
    ```
+## Running the GMHI Index
+
+To calculate the RF-GMHI index, follow these steps:
+
+```bash
+cd Camda25_gut/indexes/RF-GMHI
+python3 gmhi_calculate.py --path model_data/ --taxonomy path/to/input/taxonomy --pathways path/to/input/pathways
+```
