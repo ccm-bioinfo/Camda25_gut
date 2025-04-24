@@ -61,3 +61,4 @@ $RECYCLE.BIN/
 
 #Avoid heavy data sets
 /DataSets/CAMDA_2025/pathways_article.csv
+/DataSets/CAMDA_2025/taxa_article.csv
