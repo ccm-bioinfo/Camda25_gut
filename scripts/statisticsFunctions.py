@@ -39,6 +39,13 @@ def ReBoot(df):
             df[col][i] = df[col][i]/sum
     return df
 
+def norm(df):
+    for col in df.columns:
+    	for j in range(len(col)):
+    	     df[col][j] = math.log(df[col][i] + 0.000001 )
+    
+    return df	      
+
 
 def PermuteTaxon(t):
     #p = t.copy()

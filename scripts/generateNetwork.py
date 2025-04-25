@@ -38,6 +38,7 @@ numSamples = int(table.shape[1])
 
 rawData = table
 statisticsFunctions.ReBoot(rawData)
+#statisticsFunctions.norm(rawData)
 finish = datetime.datetime.now()
 print ( f"loading: \t {finish-start}")
 
