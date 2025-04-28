@@ -38,10 +38,10 @@ for (i in 1:dim(data)[2]){
   data[,i] <- data[,i]/sum(data[,i])
 }
 
-#print(head(data))
+
 #######ANÁLISIS DE OTUS######
 
-#data$nodos <- 0:(dim(data)[1]-1)
+data$nodos <- 0:(dim(data)[1]-1)
 
 #Eliminación de otus según su aparición en muestras
 filt <- c()
@@ -58,46 +58,39 @@ data <- data[filt,]
 
 
 ######CARGA DE RED Y AJUSTE A FILTRACIÓN DE OTUS######
-red <- paste0("./output/networks/", args[2])
+red <- paste0("./output/networks/generate_network/", args[2])
 red <- read.csv(red)
+red = red[,1:3]#se asume la forma del archivo de red
 
-#print(head(red))
-#red = red[,1:3]#se asume la forma del archivo de red
-#print(head(red))
 #Dado que se han filtrado otus, solo retendremos las aristas que se refieren a los otus conservados en nuestros datos y a correlaciones positivas
 edges <- c()
-#print(row.names(data))
 for (i in 1:dim(red)[1]) {
-  if (is.element(red[i,1], row.names(data)) && is.element(red[i,2], row.names(data)) && red[i,3] > 0  ){
+  if (is.element(red[i,1], data$nodos) && is.element(red[i,2], data$nodos) && red[i,3] > 0  ){
     edges <- c(edges , i)
   }
 }
-#print(edges)
-#print(head(red))
+
 red <- red[edges, 1:2]
 
 #####AJUSTES PREVIOS AL ISO DE igraph######
-
+#red <- red + 1
 
 for (i in 1:dim(red)[1]){
   for (j in 1:dim(red)[2]){
-    red[i,j] <- paste0( as.character(red[i,j]))
+    red[i,j] <- paste0("v_",as.character(red[i,j]))
   }
 }
 
-#print(head(red))
 
-nodos <- c()
+#data$nodos <- data$nodos + 1
+
 for (i in 1:dim(data)[1]){
-  nodos <- c(nodos , paste0(as.character(row.names(data)[i])))
+  data[i,"nodos"] <- paste0("v_" , as.character(data[i,"nodos"]))
 }
 
-data$nodos <- nodos 
 
-print(nodos)
 ########CARGA DE RED CON igraph Y ELECCION DE COMPONENTE CONEXA PRINCIPAL##### 
 
-#print(nodos)
 
 net_work <- graph_from_edgelist(as.matrix(red) , directed = FALSE )
 
@@ -124,6 +117,7 @@ for (i in 1:dim(data)[1]){
 data <- data[filtro_componente,]
 #print(dim(data))
 net_work <- induced_subgraph(net_work, compo_princ ,"auto")
+
 
 
 
@@ -161,6 +155,6 @@ hbetween <- which(data$betweenness >= quantile(data$betweenness , probs = seq(0,
 
 file <- args[3]
 
-write.csv(data[hdeg ,  ] , paste0("./output/high_degree_", file , ".csv" ) , row.names = TRUE)
-write.csv(data[hclose ,  ] , paste0("./output/high_closeness_", file , ".csv" ) , row.names = TRUE)
-write.csv(data[hbetween ,  ] , paste0("./output/high_betweenness_", file , ".csv" ) , row.names = TRUE)
+write.csv(data[hdeg ,  ] , paste0("./output/networks/centrality_measures/high_degree_", file , ".csv" ) , row.names = TRUE)
+write.csv(data[hclose ,  ] , paste0("./output/networks/centrality_measures/high_closeness_", file , ".csv" ) , row.names = TRUE)
+write.csv(data[hbetween ,  ] , paste0("./output/networks/centrality_measures/high_betweenness_", file , ".csv" ) , row.names = TRUE)
