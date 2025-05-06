@@ -21,8 +21,10 @@ numBootstraps   = 100
 loadNetworkFlag = False
 
 
-table = pd.read_table(sys.argv[1] , index_col = 0)
+table = pd.read_csv(sys.argv[1] , index_col = 0)
 table = table.astype(float)
+
+print(table)
 table.index = table.index.astype(str)
 
 #table = load_table(sys.argv[1])
@@ -35,6 +37,7 @@ outName = sys.argv[2]
 # https://biom-format.org/documentation/table_objects.html
 numTaxons = int(table.shape[0])
 numSamples = int(table.shape[1])
+print(numTaxons)
 
 rawData = table
 statisticsFunctions.ReBoot(rawData)
@@ -44,11 +47,9 @@ print ( f"loading: \t {finish-start}")
 
 network = list()
 
-#if loadNetworkFlag:
- #   network = statisticsFunctions.loadNetwork('chile_network_Pval.csv')
-#else:
         
 network = statisticsFunctions.CalculateMetricsParallel(rawData)
+
 statisticsFunctions.printNetwork(network,f"../output/networks/{outName}_raw_network.csv")
 
 statisticsFunctions.printNetworkGephi(network,list(rawData.index),f"../output/networks/{outName}_network")
