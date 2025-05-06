@@ -1,4 +1,4 @@
-category	cohort	category_binary	GMHI	hiPCA	Shannon Entropy	Shannon Entropy on Functions	sample
+category	cohort	category_binary	GMHI	hiPCA	Shannon_Entropy	Shannon_Entropy_on_Functions	sample
 healthy	BedarfJR_2017	1	-3.0407108802643	-2.23050794186539	2.712027633297373	5.090256311242019	train_0
 healthy	BedarfJR_2017	1	2.81523669438113	-0.255367571488732	2.84391088035568	4.680161174295497	train_1
 healthy	BedarfJR_2017	1	0.900492324744316	-0.746854690264906	3.213241038843553	4.994823518994955	train_2
