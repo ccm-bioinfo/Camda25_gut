@@ -2,11 +2,12 @@ import streamlit as st
 import pandas as pd
 from hiPCA import calculate_hiPCA
 from RF_GMHI import get_all_GMHI
+import joblib
 
 st.title("Gut Microbiome Health Calculator")
 
 # Create tabs
-tab_info, tab1, tab2 = st.tabs(["Information", "hiPCA Calculation", "GMHI Calculation"])
+tab_info, tab1, tab2, tab3 = st.tabs(["Information", "hiPCA Calculation", "GMHI Calculation", "Ensemble method Calculation"])
 
 # Tab: Information
 with tab_info:
@@ -74,7 +75,7 @@ with tab1:
         st.write("Preview of the uploaded file:")
         st.write(data.head(3))
 
-        models = {'CAMDA MODEL':'camda_all_samples', 'ORIGINAL MODEL (ZHU et al)':'zhu_model'}
+        models = {'ORIGINAL MODEL (ZHU et al)':'zhu_model', 'CAMDA MODEL 2024':'camda_all_samples', 'CAMDA MODEL 2025':'CAMDA2025_ALL_SAMPLES', 'GASTRO INTESTINAL CAMDA MODEL 2025':'CAMDA2025_GI_SAMPLES'}
         selected_model = st.selectbox("Select a model to use:", list(models.keys()))
 
         if st.button("Run hiPCA Calculation"):
@@ -112,7 +113,7 @@ with tab2:
         st.write("Preview of the GMHI file:")
         st.write(gmhi_data.head(3))
 
-        models = {'CAMDA MODEL':'RF_GMHI/model_data/taxonomy.csv', 'ORIGINAL MODEL':'RF_GMHI/model_data/taxonomy_original.csv'}
+        models = {'ORIGINAL MODEL':'RF_GMHI/model_data/taxonomy_original.csv', 'CAMDA MODEL':'RF_GMHI/model_data/taxonomy.csv', 'CAMDA MODEL 2025':'RF_GMHI/model_data/taxonomy_camda2025_all.csv'}
         selected_model = st.selectbox("Select a model to use:", list(models.keys()))
 
         taxonomy = pd.read_csv(f"{models[selected_model]}")
@@ -131,3 +132,68 @@ with tab2:
                 file_name='gmhi_results.csv',
                 mime='text/csv',
             )
+
+    with tab3:
+        st.header("Ensemble Method Calculation")
+
+        tax_file = st.file_uploader("Upload the taxonomy file")
+        pathways_file = st.file_uploader("Upload the pathways file")
+
+        if tax_file is not None and pathways_file is not None:
+        # Delimiter detection and file reading
+            tax_sample = tax_file.read(1024).decode('utf-8')
+            tax_file.seek(0)
+            pathways_sample = pathways_file.read(1024).decode('utf-8')
+            pathways_file.seek(0)
+
+            delimiter = '\t' if tax_sample.count('\t') > tax_sample.count(',') else ','
+            tax_data = pd.read_csv(tax_file, delimiter=delimiter, index_col=0)
+            delimiter = '\t' if pathways_sample.count('\t') > pathways_sample.count(',') else ','
+            pathways_data = pd.read_csv(pathways_file, delimiter=delimiter, index_col=0)
+            
+            st.write("Preview of the taxonomy file:")
+            st.write(tax_data.head(3))
+            st.write("Preview of the pathways file:")
+            st.write(pathways_data.head(3))
+
+            # models = {'ORIGINAL MODEL':'RF_GMHI/model_data/taxonomy_original.csv', 'CAMDA MODEL':'RF_GMHI/model_data/taxonomy.csv', 'CAMDA MODEL 2025':'RF_GMHI/model_data/taxonomy_camda2025_all.csv'}
+        
+            taxonomy = pd.read_csv('RF_GMHI/model_data/taxonomy_camda2025_all.csv')
+            MH_tax, MN_tax = set(taxonomy['Healthy']), set(taxonomy['Unhealthy'])
+
+
+
+            if st.button("Run Calculation"):
+                gmhi_results = get_all_GMHI(tax_data, MH_tax, MN_tax)
+                hiPCA_results = calculate_hiPCA(f'hiPCA/model_data/CAMDA2025_ALL_SAMPLES',tax_data)
+
+                new_data = pd.DataFrame(zip(gmhi_results, hiPCA_results['Combined Index']))
+                new_data.columns = ['GMHI_taxonomy', 'hiPCA_taxonomy']
+                pathways = pd.read_csv('ENSEMBLE/op_ensemble_model/pathways.tsv', sep = '\t')
+                # st.write(pathways_data.T.columns)
+                for path in pathways['pathways']:
+                    try:
+                        new_data[path.split(':')[0]] = list(pathways_data.T[path])
+                    except:
+                        new_data[path.split(':')[0]] = [0 for _ in range(len(new_data))]
+
+                # st.write(new_data)
+
+                model = joblib.load('ENSEMBLE/op_ensemble_model/model.pkl')
+                preds = ['Healthy' if x == 1 else 'Unhealthy' for x in model.predict(new_data)]
+                index = [x[1] if x[1] > x[0] else -x[0] for x in model.predict_proba(new_data)]
+                new_data['Model Index'] = index
+                new_data['Model Prediction'] = preds
+
+                st.write("Results of GMHI calculation:")
+                st.write(new_data)
+                # st.write(hiPCA_results)
+
+                results_csv = new_data.to_csv(index=False)
+
+                st.download_button(
+                    label="Download GMHI results as CSV",
+                    data=results_csv,
+                    file_name='results_ensemble_model.csv',
+                    mime='text/csv',
+                )
