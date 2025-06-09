@@ -22,14 +22,18 @@ def transform_data(df):
     # scaler = StandardScaler()
     aux = pd.DataFrame()
     for item in list(set(features)):
+        # print(item)
         if item in df.index:
             aux[item] = list(df.T[item])
         else:
             aux[item] = [0 for x in range(len(df.T))]
+    # print(aux)
     selected = aux.applymap(custom_transform)
 
     # scaler.fit(np.array(selected))
+    # print(selected)
     selected = selected[features]
+    # print(selected)
     selected2 = scaler.transform(selected)
     selected2 = pd.DataFrame(selected2, columns = selected.columns)
     selected2.index = df.T.index
@@ -122,6 +126,7 @@ def main():
     # taxonomy = pd.read_csv('../../DataSets/COVID/CAMDA_taxa.txt', sep = '\t', index_col = 0)
 
     data = pd.read_csv(args.input, sep = '\t', index_col = 0)
+    # data = pd.read_csv(args.input, index_col = 0)
     data = transform_data(data)
     # print(data)
     # data.to_csv('transformed.csv')
