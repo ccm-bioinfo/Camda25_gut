@@ -1,5 +1,5 @@
 Object-ID	Pathway	Common-Name	Ontology-pathway_type	General_Pathway_Type
-PWY-7112	4-hydroxy-2-nonenal_detoxification	4-hydroxy-2-nonenal_detoxification		Specialized and Miscellaneous Routes
+PWY-7112	4-hydroxy-2-nonenal_detoxification	4-hydroxy-2-nonenal_detoxification		Specialized_and_Miscellaneous_Routes
 GLYCOL-GLYOXDEG-PWY	superpathway_of_glycol_metabolism_and_degradation	superpathway_of_glycol_metabolism_and_degradation	Alcohol_Degradation|Superpathways	Metabolism of Alcohols and Aldehydes
 GOLPDLCAT-PWY	superpathway_of_glycerol_degradation_to_1,3-propanediol	superpathway_of_glycerol_degradation_to_1,3-propanediol	Alcohol_Degradation|Carbohydrate_Degradation|Superpathways	Metabolism of Alcohols and Aldehydes
 HEXITOLDEGSUPER-PWY	superpathway_of_hexitol_degradation_(bacteria)	superpathway_of_hexitol_degradation_(bacteria)	Alcohol_Degradation|Carbohydrate_Degradation|Superpathways	Metabolism of Alcohols and Aldehydes
