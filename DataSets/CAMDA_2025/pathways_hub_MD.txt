@@ -1,0 +1,6 @@
+	short	complete_path
+1	FASYN-ELONG-PWY	FASYN-ELONG-PWY:_fatty_acid_elongation_--_saturated
+2	GLYCOLYSIS-TCA-GLYOX-BYPASS	GLYCOLYSIS-TCA-GLYOX-BYPASS:_superpathway_of_glycolysis,_pyruvate_dehydrogenase,_TCA,_and_glyoxylate_bypass
+3	PWY-5686	PWY-5686:_UMP_biosynthesis
+4	PWY-5838	PWY-5838:_superpathway_of_menaquinol-8_biosynthesis_I
+5	PWY-7221	PWY-7221:_guanosine_ribonucleotides_de_novo_biosynthesis
