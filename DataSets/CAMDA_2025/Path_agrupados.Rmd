@@ -52,6 +52,12 @@ joined <- long %>%
     type_path %>% select(Object.ID, General_Pathway_Type),
     by = c("Object.ID" = "Object.ID")  # Coincidencia parcial
   )
+
+no_match <- joined %>%
+  filter(is.na(General_Pathway_Type))
+
+unique(no_match$Object.ID.x)
+
 # Agrupar y sumar los valores por sample, group y type
 joined$value <- as.numeric(joined$value)
 
