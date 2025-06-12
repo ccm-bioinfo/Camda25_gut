@@ -1,0 +1,59 @@
+	CD_path_merge_hub.txt	DD_path_merge_hub.txt	H_path_merge_hub.txt	ID_path_merge_hub.txt	MBD_path_merge_hub.txt	MD_path_merge_hub_major8.txt	NP_path_merge_hub.txt
+AST-PWY	Metabolism of amino acids and derivatives	NA	NA	Metabolism of amino acids and derivatives	Metabolism of amino acids and derivatives	NA	NA
+FAO-PWY	Lipid metabolism	NA	NA	NA	NA	NA	NA
+GLYCOLYSIS-TCA-GLYOX-BYPASS	Central metabolism and energy	Central metabolism and energy	Central metabolism and energy	Central metabolism and energy	Central metabolism and energy	Central metabolism and energy	Central metabolism and energy
+GLYOXYLATE-BYPASS	Central metabolism and energy	NA	Central metabolism and energy	Central metabolism and energy	Central metabolism and energy	NA	NA
+KETOGLUCONMET-PWY	Metabolism of Carboxylic Acids	NA	NA	Metabolism of Carboxylic Acids	Metabolism of Carboxylic Acids	NA	NA
+P105-PWY	Central metabolism and energy	Central metabolism and energy	Central metabolism and energy	Central metabolism and energy	Central metabolism and energy	NA	Central metabolism and energy
+PWY-5136	Lipid metabolism	NA	NA	NA	NA	NA	NA
+PWY-561	Central metabolism and energy	Central metabolism and energy	Central metabolism and energy	Central metabolism and energy	Central metabolism and energy	NA	Central metabolism and energy
+PWY-5675	Specialized and Miscellaneous Routes	NA	NA	Specialized and Miscellaneous Routes	Specialized and Miscellaneous Routes	NA	NA
+PWY-5723	Central metabolism and energy	NA	Central metabolism and energy	Central metabolism and energy	Central metabolism and energy	NA	NA
+PWY-5838	Biosynthesis of Cofactors and Vitamins	NA	NA	Biosynthesis of Cofactors and Vitamins	NA	Biosynthesis of Cofactors and Vitamins	NA
+PWY-5840	Biosynthesis of Cofactors and Vitamins	NA	NA	NA	NA	NA	NA
+PWY-5850	Biosynthesis of Cofactors and Vitamins	NA	NA	NA	NA	NA	NA
+PWY-5860	Biosynthesis of Cofactors and Vitamins	NA	NA	NA	NA	NA	NA
+PWY-5896	Biosynthesis of Cofactors and Vitamins	NA	NA	NA	NA	NA	NA
+PWY-5897	Biosynthesis of Cofactors and Vitamins	NA	NA	NA	NA	NA	NA
+PWY-5918	Biosynthesis of Cofactors and Vitamins	NA	NA	NA	NA	NA	NA
+PWY-5920	Biosynthesis of Cofactors and Vitamins	NA	NA	NA	NA	NA	NA
+PWY-7254	Central metabolism and energy	NA	Central metabolism and energy	Central metabolism and energy	Central metabolism and energy	NA	Central metabolism and energy
+PWY-821	Metabolism of amino acids and derivatives	NA	NA	NA	Metabolism of amino acids and derivatives	NA	NA
+PWY0-1415	Biosynthesis of Cofactors and Vitamins	NA	NA	NA	NA	NA	NA
+SULFATE-CYS-PWY	Specialized and Miscellaneous Routes	NA	NA	NA	NA	NA	NA
+TCA-GLYOX-BYPASS	Specialized and Miscellaneous Routes	Specialized and Miscellaneous Routes	Specialized and Miscellaneous Routes	Specialized and Miscellaneous Routes	Specialized and Miscellaneous Routes	NA	Specialized and Miscellaneous Routes
+ALL-CHORISMATE-PWY	NA	Specialized and Miscellaneous Routes	NA	NA	NA	NA	NA
+LYSINE-DEG1-PWY	NA	Metabolism of amino acids and derivatives	NA	NA	NA	NA	NA
+PWY-5067	NA	Carbohydrate metabolism	NA	NA	NA	NA	NA
+PWY-5872	NA	Biosynthesis of Cofactors and Vitamins	NA	NA	NA	NA	NA
+PWY-6309	NA	Metabolism of amino acids and derivatives	NA	NA	NA	NA	NA
+PWY-6351	NA	Carbohydrate metabolism	NA	NA	NA	NA	NA
+PWY-6948	NA	Lipid metabolism	NA	NA	NA	NA	NA
+PWY-7283	NA	Nucleotide and Nucleic Acid Metabolism	NA	NA	NA	NA	NA
+PWY-7433	NA	Carbohydrate metabolism	NA	NA	NA	NA	NA
+PWY3O-19	NA	Biosynthesis of Cofactors and Vitamins	NA	NA	NA	NA	NA
+PWY66-374	NA	Signaling and Regulation Metabolism	NA	NA	NA	NA	NA
+FERMENTATION-PWY	NA	NA	NA	Central metabolism and energy	NA	NA	NA
+FUC-RHAMCAT-PWY	NA	NA	NA	Specialized and Miscellaneous Routes	NA	NA	NA
+GALACTARDEG-PWY	NA	NA	NA	Metabolism of Carboxylic Acids	NA	NA	NA
+GLUCARDEG-PWY	NA	NA	NA	Metabolism of Carboxylic Acids	NA	NA	NA
+GLUCARGALACTSUPER-PWY	NA	NA	NA	Specialized and Miscellaneous Routes	NA	NA	NA
+P4-PWY	NA	NA	NA	Metabolism of amino acids and derivatives	NA	NA	NA
+P441-PWY	NA	NA	NA	Metabolism of Carboxylic Acids	NA	NA	NA
+P461-PWY	NA	NA	NA	Central metabolism and energy	NA	NA	NA
+PWY-4702	NA	NA	NA	Carbohydrate metabolism	NA	NA	NA
+PWY-5861	NA	NA	NA	Biosynthesis of Cofactors and Vitamins	NA	NA	NA
+PWY-5971	NA	NA	NA	Lipid metabolism	NA	NA	NA
+PWY-6151	NA	NA	NA	Biosynthesis of Cofactors and Vitamins	NA	NA	NA
+PWY-6284	NA	NA	NA	Lipid metabolism	NA	NA	NA
+PWY-6285	NA	NA	NA	Lipid metabolism	Lipid metabolism	NA	NA
+PWY-6531	NA	NA	NA	Metabolism of Alcohols and Aldehydes	NA	NA	NA
+PWY-6608	NA	NA	NA	Nucleotide and Nucleic Acid Metabolism	NA	NA	NA
+PWY-6628	NA	NA	NA	Metabolism of amino acids and derivatives	NA	NA	NA
+PWY-6803	NA	NA	NA	Lipid metabolism	Lipid metabolism	NA	NA
+PWY0-781	NA	NA	NA	Specialized and Miscellaneous Routes	NA	NA	NA
+SALVADEHYPOX-PWY	NA	NA	NA	Nucleotide and Nucleic Acid Metabolism	NA	NA	NA
+KDO-NAGLIPASYN-PWY	NA	NA	NA	NA	Lipid metabolism	NA	NA
+FASYN-ELONG-PWY	NA	NA	NA	NA	NA	Lipid metabolism	NA
+PWY-5686	NA	NA	NA	NA	NA	Nucleotide and Nucleic Acid Metabolism	NA
+PWY-7221	NA	NA	NA	NA	NA	Nucleotide and Nucleic Acid Metabolism	NA
