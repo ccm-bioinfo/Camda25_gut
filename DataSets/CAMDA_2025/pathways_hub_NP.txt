@@ -1,0 +1,6 @@
+	short	complete_path
+1	GLYCOLYSIS-TCA-GLYOX-BYPASS	GLYCOLYSIS-TCA-GLYOX-BYPASS:_superpathway_of_glycolysis,_pyruvate_dehydrogenase,_TCA,_and_glyoxylate_bypass
+2	P105-PWY	P105-PWY:_TCA_cycle_IV_(2-oxoglutarate_decarboxylase)
+3	PWY-561	PWY-561:_superpathway_of_glyoxylate_cycle_and_fatty_acid_degradation
+4	PWY-7254	PWY-7254:_TCA_cycle_VII_(acetate-producers)
+5	TCA-GLYOX-BYPASS	TCA-GLYOX-BYPASS:_superpathway_of_glyoxylate_bypass_and_TCA
