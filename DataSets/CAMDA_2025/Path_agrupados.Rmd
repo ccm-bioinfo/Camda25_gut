@@ -82,28 +82,41 @@ write.table(Path_grouped, file = "DataSets/CAMDA_2025/Path_agrupados.txt", row.n
 # Lista de columnas numéricas a graficar
 columns_to_plot <- unique(grouped$General_Pathway_Type)
 
+# Definir la paleta de colores (la misma que antes)
+group_colors <- c(
+  'ID' = '#56B4E9',   
+  'NP' = '#E69F00',    
+  'MD' = '#0072B2',    
+  'MBD' = '#CC79A7',  
+  'CD' = '#F0E442',   
+  'DD' = '#D55E00',    
+  'H' = '#009E73'
+)
 
-# Loop para crear una gráfica por variable
+# Loop modificado con la paleta de colores
 for (col_name in columns_to_plot) {
   p <- ggplot(Path_grouped %>% filter(Group != "delete"), 
               aes_string(x = col_name, fill = "Group", color = "Group")) +
     geom_density(alpha = 0.4) +
+    scale_fill_manual(values = group_colors) +  # Aplica colores de relleno
+    scale_color_manual(values = group_colors) + # Aplica colores de línea
     labs(
-      title = paste (col_name),
+      title = paste(col_name),
       x = "Total de valores",
       y = "Densidad"
     ) +
     theme_minimal()
 
   ggsave(
-    filename = paste0("DataSets/CAMDA_2025/densidad_pathways/", gsub("[^a-zA-Z0-9]", "_", col_name), ".png"),
+    filename = paste0("DataSets/CAMDA_2025/densidad_pathways/", 
+                     gsub("[^a-zA-Z0-9]", "_", col_name), ".png"),
     plot = p,
-    width = 8, height = 5
+    width = 8, 
+    height = 5
   )
 
   print(p)
 }
-
 
 ```
 ```{r}
@@ -141,26 +154,40 @@ write.table(Path_grouped_P, file = "DataSets/CAMDA_2025/Path_agrupados_Parental.
 columns_to_plot <- unique(grouped_Parental$Parental.Ontology.pathway_type)
 
 
+# Definir la paleta de colores
+group_colors <- c(
+  'ID' = '#56B4E9',   
+  'NP' = '#E69F00',    
+  'MD' = '#0072B2',    
+  'MBD' = '#CC79A7',  
+  'CD' = '#F0E442',   
+  'DD' = '#D55E00',    
+  'H' = '#009E73'
+)
+
 # Loop para crear una gráfica por variable
 for (col_name in columns_to_plot) {
   p <- ggplot(Path_grouped_P %>% filter(Group != "delete"), 
               aes_string(x = col_name, fill = "Group", color = "Group")) +
     geom_density(alpha = 0.4) +
+    scale_fill_manual(values = group_colors) +
+    scale_color_manual(values = group_colors) +
     labs(
-      title = paste (col_name),
+      title = paste(col_name),
       x = "Total de valores",
       y = "Densidad"
     ) +
     theme_minimal()
 
   ggsave(
-    filename = paste0("DataSets/CAMDA_2025/densidad_pathways/", gsub("[^a-zA-Z0-9]", "_", col_name), "Parental.png"),
+    filename = paste0("DataSets/CAMDA_2025/densidad_pathways/", 
+                     gsub("[^a-zA-Z0-9]", "_", col_name), "Parental.png"),
     plot = p,
-    width = 8, height = 5
+    width = 8, 
+    height = 5
   )
 
   print(p)
 }
-
 
 ```
