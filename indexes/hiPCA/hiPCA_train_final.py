@@ -1,303 +1,241 @@
+"""
+hiPCA (Health Index with Principal Component Analysis)
+A statistical framework for personalized health monitoring using gut microbiome data
+"""
+
 import pandas as pd
 import numpy as np
-import json
-import pickle
-import os
-from scipy.stats import kstest
+from scipy.stats import kstest, chi2, norm
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
-from scipy.stats import chi2, norm
-from sklearn.metrics import balanced_accuracy_score
 import argparse
+import os
+import json
+import pickle
 
-
-
-def ks_test(df, healthy, non_healthy, method_ks = 'asymp', p_val = 0.001):
-    healthy_df = df[[x for x in df.columns if x in healthy]].T
-    nonhealthy_df = df[[x for x in df.columns if x in non_healthy]].T
+def ks_test(df, healthy_samples, non_healthy_samples, method='asymp', p_val=0.001):
+    """
+    Perform Kolmogorov-Smirnov test to identify health-associated microbial features
+    
+    Args:
+        df: DataFrame containing microbial abundance data
+        healthy_samples: List of healthy sample IDs
+        non_healthy_samples: List of non-healthy sample IDs
+        method: KS test method ('asymp', 'exact', 'approx')
+        p_val: Significance threshold
+        
+    Returns:
+        Tuple of (healthy_features, nonhealthy_features)
+    """
+    healthy_df = df[healthy_samples].T
+    nonhealthy_df = df[non_healthy_samples].T
+    
     healthy_features = []
     nonhealthy_features = []
-    for feature in list(df.index):
-        if kstest(list(healthy_df[feature]), list(nonhealthy_df[feature]), alternative = 'less', method = method_ks).pvalue <= p_val:
+    
+    for feature in df.index:
+        # Test for features more abundant in healthy
+        healthy_pval = kstest(healthy_df[feature], nonhealthy_df[feature], 
+                             alternative='less', method=method).pvalue
+        if healthy_pval <= p_val:
             healthy_features.append(feature)
-        if kstest(list(nonhealthy_df[feature]), list(healthy_df[feature]), alternative = 'less', method = method_ks).pvalue <= p_val:
+            
+        # Test for features more abundant in non-healthy
+        nonhealthy_pval = kstest(nonhealthy_df[feature], healthy_df[feature],
+                                alternative='less', method=method).pvalue
+        if nonhealthy_pval <= p_val:
             nonhealthy_features.append(feature)
-    print(f'# Healthy features selected by KS: {len(healthy_features)}')
-    print(f'# Unheatlhy features selected by KS: {len(nonhealthy_features)}')
+            
+    print(f'Healthy features selected: {len(healthy_features)}')
+    print(f'Unhealthy features selected: {len(nonhealthy_features)}')
     return healthy_features, nonhealthy_features
 
 def custom_transform(x):
-    if x <= 1:
-        return np.log2(2 * x + 0.00001)
-    else:
-        return np.sqrt(x)
+    """Custom transformation for microbiome abundance data"""
+    return np.log2(2 * x + 1e-5) if x <= 1 else np.sqrt(x)
 
-def transform_data(df, features):
+def transform_and_scale(df, features, model_dir):
+    """
+    Transform and scale microbiome data
+    
+    Args:
+        df: Raw abundance DataFrame
+        features: List of features to include
+        model_dir: Directory to save scaling parameters
+        
+    Returns:
+        Tuple of (transformed_data, scaler)
+    """
+    # Create dataframe with selected features
+    data = pd.DataFrame()
+    for feature in set(features):
+        data[feature] = df.T[feature] if feature in df.index else 0
+    
+    # Apply custom transformation
+    transformed = data.applymap(custom_transform)
+    
+    # Standardize data
     scaler = StandardScaler()
-    aux = pd.DataFrame()
-    for item in list(set(features)):
-        if item in df.index:
-            aux[item] = list(df.T[item])
-        else:
-            aux[item] = [0 for x in range(len(df.T))]
-    selected = aux.applymap(custom_transform)
-
-    scaler.fit(selected)
-    with open(f'model_data/{model_name}/scaler.pkl', 'wb') as file:
-        pickle.dump(scaler, file)
-    selected2 = scaler.transform(selected)
+    scaled_data = scaler.fit_transform(transformed)
     
-    pd.DataFrame(zip(selected.columns, scaler.mean_, scaler.scale_), columns = ['specie', 'mean', 'std']).to_csv(f'model_data/{model_name}/scaling_parameters.csv', index = False)
+    # Save scaling parameters
+    os.makedirs(model_dir, exist_ok=True)
+    with open(f'{model_dir}/scaler.pkl', 'wb') as f:
+        pickle.dump(scaler, f)
+    
+    scaling_params = pd.DataFrame({
+        'specie': transformed.columns,
+        'mean': scaler.mean_,
+        'std': scaler.scale_
+    })
+    scaling_params.to_csv(f'{model_dir}/scaling_parameters.csv', index=False)
+    
+    return pd.DataFrame(scaled_data, columns=transformed.columns, index=df.T.index), scaler
 
-
-    # for c in selected.columns:
-    #     scaler.fit(np.array(selected[c]).reshape(-1, 1))
-    #     selected[c] = scaler.transform(np.array(selected[c]).reshape(-1, 1))
-        # params = params.append({'mean':scaler.mean_[0], 'std':scaler.scale_[0]}, ignore_index=True)
-        # print(scaler.mean_)
-        # print(scaler.scale_)
-    # print(selected)
-    selected2 = pd.DataFrame(selected2, columns = selected.columns)
-    selected2.index = df.T.index
-
-    return selected2
-
-
-def calculate_pca_stats(df, variance_for_pc = 0.9, alpha = 0.05):
+def calculate_pca_model(data, variance_threshold=0.9, alpha=0.05, model_dir=None):
+    """
+    Perform PCA and calculate monitoring statistics
+    
+    Args:
+        data: Transformed microbiome data
+        variance_threshold: Variance threshold for PC selection
+        alpha: Significance level for thresholds
+        model_dir: Directory to save model outputs
+        
+    Returns:
+        Tuple of PCA model and monitoring parameters
+    """
     pca = PCA()
-
-    pca.fit(df)
-
-    with open(f'model_data/{model_name}/pca_model.pkl', 'wb') as file:
-        pickle.dump(pca, file)
-
-    eigenvalues = pca.explained_variance_
-    eigenvectors = pca.components_
-    singular = pca.singular_values_
+    pca.fit(data)
     
-    pca_data = pd.DataFrame(zip(eigenvectors, eigenvalues, singular), columns = ('Eigenvectors', 'Explained_variance', 'Singular_values')).sort_values('Explained_variance', ascending = False)
-    pca_data['%variance'] = pca_data['Explained_variance'] / sum(pca_data['Explained_variance'])
-    pca_data = pca_data.sort_values('%variance', ascending = False)
+    if model_dir:
+        with open(f'{model_dir}/pca_model.pkl', 'wb') as f:
+            pickle.dump(pca, f)
+    
+    # Create PCA summary
+    eigenvalues = pca.explained_variance_
+    pca_data = pd.DataFrame({
+        'Eigenvectors': list(pca.components_),
+        'Explained_variance': eigenvalues,
+        '%variance': eigenvalues / eigenvalues.sum()
+    }).sort_values('%variance', ascending=False)
     pca_data['%variance_cumulative'] = pca_data['%variance'].cumsum()
     
-    principal_components = list(pca_data[pca_data['%variance_cumulative'] < variance_for_pc]['Eigenvectors'])
-    print(f'# Principal Components selected: {len(principal_components)}')
+    # Split components
+    principal_mask = pca_data['%variance_cumulative'] < variance_threshold
+    principal_components = pca_data[principal_mask]['Eigenvectors']
+    principal_values = pca_data[principal_mask]['Explained_variance']
     
-    principal_values = list(pca_data[pca_data['%variance_cumulative'] < variance_for_pc]['Explained_variance'])
-    D = np.array(principal_components).T @ np.linalg.inv(np.diag(principal_values)) @ np.array(principal_components)
-    deg_free = len(principal_components) 
-    # alpha = 0.05
-    t2_threshold = chi2.ppf(1-alpha, deg_free)
-#     print(1-alpha, deg_free)
-#     print(t2_threshold)
+    # Hotelling's T² parameters
+    D = principal_components.T @ np.linalg.inv(np.diag(principal_values)) @ principal_components
+    t2_threshold = chi2.ppf(1-alpha, len(principal_components))
     
-    principal_components_residual = list(pca_data[pca_data['%variance_cumulative'] >= variance_for_pc]['Eigenvectors'])
-    principal_values_residual = list(pca_data[pca_data['%variance_cumulative'] >= variance_for_pc]['Explained_variance'])
-    principal_singvalues_residual = list(pca_data[pca_data['%variance_cumulative'] >= variance_for_pc]['Singular_values'])
+    # Q statistic parameters
+    residual_components = pca_data[~principal_mask]['Eigenvectors']
+    C = residual_components.T @ residual_components
+    Theta1 = pca_data[~principal_mask]['Explained_variance'].sum()
+    Theta2 = (pca_data[~principal_mask]['Explained_variance']**2).sum()
     
-    C = np.array(principal_components_residual).T @ np.array(principal_components_residual)
-    Theta1 = sum(principal_values_residual)
-    Theta2 = sum([x**2 for x in principal_values_residual])
-    Theta3 = sum([x**3 for x in principal_values_residual])
+    # Q threshold calculation
+    Q_alpha = (Theta2/Theta1) * chi2.ppf(1-alpha, len(residual_components)) * (Theta1**2/Theta2)
     
-    c_alpha = norm.ppf(1-alpha)
+    # Combined index parameters
+    fi = D/t2_threshold + C/Q_alpha
+    g = ((len(principal_components)/t2_threshold**2) + (Theta2/Q_alpha**2)) / (
+         (len(principal_components)/t2_threshold) + (Theta1/Q_alpha))
+    h = ((len(principal_components)/t2_threshold) + (Theta1/Q_alpha))**2 / (
+         (len(principal_components)/t2_threshold**2) + (Theta2/Q_alpha**2))
+    threshold_combined = g * chi2.ppf(1-alpha, h)
     
-    h0 = 1-((2*Theta1*Theta3)/(3*(Theta2**2)))
-
-    '''INTENTO'''
-    Q_alpha = Theta1*(((((c_alpha*np.sqrt(2*Theta2*(h0**2)))/Theta1)+1+((Theta2*h0*(h0-1))/(Theta1**2))))**(1/h0))
-    # print(Q_alpha)
-    Q_alpha = Theta1*(((((np.sqrt(c_alpha*(2*Theta2*(h0**2))))/Theta1)+1-((Theta2*h0*(h0-1))/(Theta1**2))))**(1/h0))
-    # print(Q_alpha)
-    Q_alpha = (Theta2/Theta1) * chi2.ppf(alpha, len(principal_components_residual)) * ((Theta1**2)/Theta2)
-    # print(Q_alpha)
-    
-    # Q_alpha = Theta1*(((((c_alpha*np.sqrt(2*Theta2*(h0**2)))/Theta1)+1+((Theta2*h0*(h0-1))/(Theta1**2))))**(1/h0))
-    
-    #fi = D/t2_threshold + (np.eye(len(principal_components[0])) - (np.array(principal_components).T @ np.array(principal_components)))/Q_alpha
-    fi = D/t2_threshold  + C/Q_alpha
-    g = ((len(principal_components) / t2_threshold**2) + (Theta2 / Q_alpha**2)) / ((len(principal_components)/t2_threshold) + (Theta1 / Q_alpha))
-    h = ((len(principal_components)/t2_threshold) + (Theta1 / Q_alpha))**2 / ((len(principal_components) / t2_threshold**2) + (Theta2 / Q_alpha**2))
-
-    chi_value = chi2.ppf(1-alpha, h)
-    threshold_combined = g*chi_value
+    # Save model outputs
+    if model_dir:
+        np.save(f'{model_dir}/D_matrix.npy', D)
+        np.save(f'{model_dir}/C_matrix.npy', C)
+        np.save(f'{model_dir}/fi_matrix.npy', fi)
+        with open(f'{model_dir}/thresholds.json', 'w') as f:
+            json.dump({
+                't2': t2_threshold,
+                'q': Q_alpha,
+                'combined': threshold_combined
+            }, f)
     
     return pca, pca_data, D, t2_threshold, C, Q_alpha, fi, threshold_combined
 
-def hotelling_t2(df, pca, pca_data, variance_for_pc = 0.9, alpha = 0.05):
-    principal_components = list(pca_data[pca_data['%variance_cumulative'] < variance_for_pc]['Eigenvectors'])
-    print(f'# Principal Components selected: {len(principal_components)}')
-    principal_values = list(pca_data[pca_data['%variance_cumulative'] < variance_for_pc]['Explained_variance'])
-    D = np.array(principal_components).T @ np.linalg.inv(np.diag(principal_values)) @ np.array(principal_components)
-    deg_free = len(principal_components) 
-    # alpha = 0.05
-    t2_threshold = chi2.ppf(1-alpha, deg_free)
-    T2 = []
-    pred = []
+def train_hipca(data, healthy_samples, non_healthy_samples, model_dir, 
+               use_ks=True, ks_method='asymp', ks_pval=0.001, only_nonhealthy=False):
+    """
+    Train hiPCA model
     
-    try:
-        for item in pca.transform(df):
-            index = item.T @ D @ item
-            T2.append(index)
-            if index > t2_threshold:
-                pred.append('Unhealthy')
-            else:
-                pred.append('Healthy')
-    except:
-        for item in np.array(df):
-            index = item.T @ D @ item
-            T2.append(index)
-            if index > t2_threshold:
-                pred.append('Unhealthy')
-            else:
-                pred.append('Healthy')
-            
-    hoteling = pd.DataFrame(zip(df.index, T2, pred), columns = ['Sample', 'T2', 'Prediction T2'])
-    
-    return D, principal_components, hoteling, t2_threshold
-
-def Q_statistic(df, pca, pca_data, variance_for_pc = 0.9, alpha = 0.05):
-    principal_components_residual = list(pca_data[pca_data['%variance_cumulative'] >= variance_for_pc]['Eigenvectors'])
-    principal_values_residual = list(pca_data[pca_data['%variance_cumulative'] >= variance_for_pc]['Explained_variance'])
-    principal_singvalues_residual = list(pca_data[pca_data['%variance_cumulative'] >= variance_for_pc]['Singular_values'])
-    
-    C = np.array(principal_components_residual).T @ np.array(principal_components_residual)
-    Theta1 = sum(principal_values_residual)
-    Theta2 = sum([x**2 for x in principal_values_residual])
-    Theta3 = sum([x**3 for x in principal_values_residual])
-    
-    c_alpha = norm.ppf(1-alpha)
-    
-    h0 = 1-((2*Theta1*Theta3)/(3*Theta2**2))
-
-    #! NO BORRAR ORIGINAL
-    Q_alpha = Theta1*(((((c_alpha*np.sqrt(2*Theta2*(h0**2)))/Theta1)+1+((Theta2*h0*(h0-1))/(Theta1**2))))**(1/h0))
-    print(Q_alpha)
-    Q_alpha = Theta1*(((((np.sqrt(c_alpha*(2*Theta2*(h0**2))))/Theta1)+1-((Theta2*h0*(h0-1))/(Theta1**2))))**(1/h0))
-    print(Q_alpha)
-    Q_alpha = (Theta2/Theta1) * chi2.ppf(1-alpha, len(principal_components_residual)) * ((Theta1**2)/Theta2)
-    print(Q_alpha)
-    
-    Q = []
-    pred = []
-    try:
-        for item in pca.transform(df):
-            index = item.T @ C @ item
-            Q.append(index)
-            if index > Q_alpha:
-                pred.append('Unhealthy')
-            else:
-                pred.append('Healthy')
-    except:
-        for item in np.array(df):
-            index = item.T @ C @ item
-            Q.append(index)
-            if index > Q_alpha:
-                pred.append('Unhealthy')
-            else:
-                pred.append('Healthy')
-    
-    Q_statistic = pd.DataFrame(zip(df.index, Q, pred), columns = ['Sample', 'Q', 'Prediction Q'])
-    
-    return C, Theta1, Theta2, Q_statistic, Q_alpha
-    
-
-def combined_index(df, D, t2_threshold, principal_components, Q_alpha, Theta1, Theta2, pca, alpha = 0.05):
-    fi = D/t2_threshold + (np.eye(len(principal_components[0])) - (np.array(principal_components).T @ np.array(principal_components)))/Q_alpha
-    g = ((len(principal_components) / t2_threshold**2) + (Theta2 / Q_alpha**2)) / ((len(principal_components)/t2_threshold) + (Theta1 / Q_alpha))
-    h = ((len(principal_components)/t2_threshold) + (Theta1 / Q_alpha))**2 / ((len(principal_components) / t2_threshold**2) + (Theta2 / Q_alpha**2))
-
-    chi_value = chi2.ppf(1-alpha, h)
-    threshold_combined = g*chi_value
-    combined = []
-    pred = []
-
-    try:
-        for item in pca.transform(df):
-            index = item.T @ fi @ item
-            combined.append(index)
-            if index > threshold_combined:
-                pred.append('Unhealthy')
-            else:
-                pred.append('Healthy')
-    except:
-        for item in np.array(df):
-            index = item.T @ fi @ item
-            combined.append(index)
-            if index > threshold_combined:
-                pred.append('Unhealthy')
-            else:
-                pred.append('Healthy')
-
-    combined = pd.DataFrame(zip(df.index, combined, pred), columns = ['Sample', 'Combined', 'Prediction Combined']) 
-    return combined
-
-def hiPCA(df, healthy, non_healthy, features = [], ks = False, method = 'auto', p_val = 0.001, only_nonhealthy_features = False):
-    if ks:
-        healthy_features, non_healthy_features = ks_test(df, healthy, non_healthy, method_ks = method, p_val = p_val)
+    Args:
+        data: Raw microbiome data
+        healthy_samples: List of healthy sample IDs
+        non_healthy_samples: List of non-healthy sample IDs
+        model_dir: Directory to save model outputs
+        use_ks: Whether to perform KS test feature selection
+        ks_method: KS test method
+        ks_pval: KS test p-value threshold
+        only_nonhealthy: Use only non-healthy associated features
         
-    if only_nonhealthy_features:
-        healthy_features = []
-        if ks:
-            features = healthy_features + non_healthy_features
-        selected = transform_data(df[[x for x in healthy if x in df.columns]], features)
-        
-    else:
-        if ks:
-            features = healthy_features + non_healthy_features
-        selected = transform_data(df[[x for x in healthy if x in df.columns]], features)
+    Returns:
+        Tuple of model components
+    """
+    # Feature selection
+    features = []
+    if use_ks:
+        healthy_feats, nonhealthy_feats = ks_test(
+            data, healthy_samples, non_healthy_samples, 
+            method=ks_method, p_val=ks_pval)
+        features = nonhealthy_feats if only_nonhealthy else healthy_feats + nonhealthy_feats
     
-    # print(selected)
-    pca, pca_data, D, t2_threshold, C, Q_alpha, fi, threshold_combined = calculate_pca_stats(selected)
-    np.save(f'model_data/{model_name}/D_matrix.npy', D)
-    np.save(f'model_data/{model_name}/C_matrix.npy', C)
-    np.save(f'model_data/{model_name}/fi_matrix.npy', fi)
+    # Data transformation
+    transformed_data, scaler = transform_and_scale(
+        data[healthy_samples], features, model_dir)
+    
+    # PCA modeling
+    pca, pca_data, D, t2, C, Q, fi, combined = calculate_pca_model(
+        transformed_data, model_dir=model_dir)
+    
+    print(f'Thresholds - T²: {t2:.2f}, Q: {Q:.2f}, Combined: {combined:.2f}')
+    
+    return features, pca, pca_data, D, t2, C, Q, fi, combined, transformed_data
 
-    thresholds = {'t2':t2_threshold, 'c':Q_alpha, 'combined':threshold_combined}
-
-    with open(f'model_data/{model_name}/thresholds.json', 'w') as json_file:
-        json.dump(thresholds, json_file)
-
-    print(t2_threshold, Q_alpha, threshold_combined)
-
-        
-    return features, pca, pca_data, D, t2_threshold, C, Q_alpha, fi, threshold_combined, selected
-
-def parse_args():
+def parse_arguments():
+    """Parse command line arguments"""
     parser = argparse.ArgumentParser(description="Train hiPCA model")
-    parser.add_argument('--model_name', required=True, type=str, help="Name of the model")
-    parser.add_argument('--input', required=True, type=str, help="Path to input data")
-    parser.add_argument('--metadata', required=True, type=str, help="Path to metadata")
-    parser.add_argument('--sample', required=True, type=str, help="Name of the column containning the ID of the sample in the metadata")
-    parser.add_argument('--diagnosis', required=True, type=str, help="Name of the column containning the diagnosis in the metadata")
-    parser.add_argument('--control', required=True, type=str, help="Identifier of the control sample")
-
-    parser.add_argument(
-        '--method',
-        type=str,
-        choices=['exact', 'approx', 'asymp'],
-        default='asymp',
-        help='Computation method for KS test to use'
-    )
-
+    parser.add_argument('--model_name', required=True, help="Name for the model")
+    parser.add_argument('--input', required=True, help="Path to input data")
+    parser.add_argument('--metadata', required=True, help="Path to metadata")
+    parser.add_argument('--sample_col', required=True, help="Column with sample IDs")
+    parser.add_argument('--diagnosis_col', required=True, help="Column with diagnoses")
+    parser.add_argument('--control_label', required=True, help="Label for control samples")
+    parser.add_argument('--ks_method', default='asymp', 
+                       choices=['exact', 'approx', 'asymp'],
+                       help='KS test computation method')
     return parser.parse_args()
 
 def main():
-    args = parse_args()
-    global model_name
-    model_name = args.model_name
-    os.makedirs(f'model_data/{args.model_name}', exist_ok=True)
-    #! Missing evaluation of correct data
-    data = pd.read_csv(f'{args.input}', sep = '\t', index_col = 0)
-
-    metadata = pd.read_csv(f'{args.metadata}', sep = '\t')
-
-    healthy = list(metadata[metadata[args.diagnosis] == args.control][args.sample])
-    non_healthy = list(metadata[metadata[args.diagnosis] != args.control][args.sample])
-
-    features, pca, pca_data, D, t2_threshold, C, Q_alpha, fi, threshold_combined, selected = hiPCA(data, healthy, non_healthy, ks = True, method = args.method, only_nonhealthy_features = True)
-
-
+    """Main execution function"""
+    args = parse_arguments()
+    model_dir = f'model_data/{args.model_name}'
+    
+    # Load data
+    data = pd.read_csv(args.input, sep='\t', index_col=0)
+    metadata = pd.read_csv(args.metadata, sep='\t')
+    
+    # Get sample groups
+    healthy = metadata[metadata[args.diagnosis_col] == args.control_label][args.sample_col]
+    non_healthy = metadata[metadata[args.diagnosis_col] != args.control_label][args.sample_col]
+    
+    # Train model
+    train_hipca(
+        data=data,
+        healthy_samples=healthy,
+        non_healthy_samples=non_healthy,
+        model_dir=model_dir,
+        use_ks=True,
+        ks_method=args.ks_method,
+        only_nonhealthy=True
+    )
 
 if __name__ == "__main__":
     main()
