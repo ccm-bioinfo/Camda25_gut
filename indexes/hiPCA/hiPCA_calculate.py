@@ -1,147 +1,181 @@
-"""
-hiPCA Evaluation Script
-A streamlined implementation for calculating health indexes using a pre-trained hiPCA model
-"""
-
 import pandas as pd
-import numpy as np
 import pickle
 import joblib
+import numpy as np
 import json
 import argparse
-from pathlib import Path
 
-class HiPCAEvaluator:
-    """Class for evaluating samples using a pre-trained hiPCA model"""
+
+def custom_transform(x):
+    """
+    Apply custom transformation to data values.
     
-    def __init__(self, model_path):
-        """
-        Initialize evaluator with model path
+    Args:
+        x: Input value to transform
         
-        Args:
-            model_path: Path to directory containing hiPCA model files
-        """
-        self.model_path = Path(model_path)
-        self._load_model_components()
-        
-    def _load_model_components(self):
-        """Load all required model components from disk"""
-        # Load scaling parameters and scaler
-        self.scaling_data = pd.read_csv(self.model_path / 'scaling_parameters.csv')
-        self.features = list(self.scaling_data['specie'])
-        
-        with open(self.model_path / 'scaler.pkl', 'rb') as f:
-            self.scaler = pickle.load(f)
-            
-        # Load PCA model and matrices
-        self.pca = joblib.load(self.model_path / 'pca_model.pkl')
-        self.D = np.load(self.model_path / 'D_matrix.npy')
-        self.C = np.load(self.model_path / 'C_matrix.npy')
-        self.fi = np.load(self.model_path / 'fi_matrix.npy')
-        
-        # Load thresholds
-        with open(self.model_path / 'thresholds.json', 'r') as f:
-            thresholds = json.load(f)
-            self.t2_threshold = thresholds['t2']
-            self.Q_alpha = thresholds['c']
-            self.threshold_combined = thresholds['combined']
+    Returns:
+        Transformed value using log2 for x <= 1, sqrt for x > 1
+    """
+    if x <= 1:
+        return np.log2(2 * x + 0.00001)
+    else:
+        return np.sqrt(x)
+
+
+def transform_data(df):
+    """
+    Transform input data using scaling parameters and custom transformation.
     
-    @staticmethod
-    def custom_transform(x):
-        """Custom abundance transformation function"""
-        return np.log2(2 * x + 1e-5) if x <= 1 else np.sqrt(x)
+    Args:
+        df: Input DataFrame with species data
+        
+    Returns:
+        Transformed and scaled DataFrame ready for PCA analysis
+    """
+    # Load scaling parameters and feature list
+    scaling_data = pd.read_csv(f'{path}/scaling_parameters.csv')
+    features = list(scaling_data['specie'])
     
-    def transform_data(self, raw_data):
-        """
-        Transform and scale input data using model parameters
-        
-        Args:
-            raw_data: Raw microbiome abundance DataFrame
-            
-        Returns:
-            Transformed and scaled DataFrame
-        """
-        # Create dataframe with model features
-        data = pd.DataFrame()
-        for feature in self.features:
-            data[feature] = raw_data.T[feature] if feature in raw_data.index else 0
-        
-        # Apply transformations
-        transformed = data.applymap(self.custom_transform)
-        scaled = self.scaler.transform(transformed)
-        
-        return pd.DataFrame(scaled, columns=transformed.columns, index=raw_data.T.index)
+    # Load pre-fitted scaler
+    with open(f'{path}/scaler.pkl', 'rb') as file:
+        scaler = pickle.load(file)
     
-    def calculate_indexes(self, data):
-        """
-        Calculate health indexes for transformed data
+    # Create auxiliary DataFrame with required features
+    aux = pd.DataFrame()
+    for item in list(set(features)):
+        if item in df.index:
+            aux[item] = list(df.T[item])
+        else:
+            # Fill missing features with zeros
+            aux[item] = [0 for x in range(len(df.T))]
+    
+    # Apply custom transformation to all values
+    selected = aux.applymap(custom_transform)
+    
+    # Reorder columns to match training feature order
+    selected = selected[features]
+    
+    # Apply pre-fitted scaler transformation
+    selected2 = scaler.transform(selected)
+    selected2 = pd.DataFrame(selected2, columns=selected.columns)
+    selected2.index = df.T.index
+    
+    return selected2
+
+
+def calculate_index(data_transformed):
+    """
+    Calculate health indices (T2, Q, Combined) using PCA and matrix operations.
+    
+    Args:
+        data_transformed: Transformed DataFrame from transform_data()
         
-        Args:
-            data: Transformed microbiome data
+    Returns:
+        DataFrame with sample IDs, calculated indices, and health predictions
+    """
+    # Load pre-computed matrices and PCA model
+    D = np.load(f'{path}/D_matrix.npy')
+    C = np.load(f'{path}/C_matrix.npy')
+    fi = np.load(f'{path}/fi_matrix.npy')
+    pca = joblib.load(f'{path}/pca_model.pkl')
+    
+    # Load threshold values for health classification
+    with open(f'{path}/thresholds.json', 'r') as file:
+        thresholds = json.load(file)
+        t2_threshold = thresholds['t2']
+        Q_alpha = thresholds['c']
+        threshold_combined = thresholds['combined']
+    
+    # Initialize result lists
+    T2, Q, combined = [], [], []
+    pred_t2, pred_Q, pred_combined = [], [], []
+    
+    # Try PCA transformation first, fall back to direct array if it fails
+    try:
+        # Apply PCA transformation and calculate indices
+        for item in pca.transform(data_transformed):
+            # Calculate T2, Q, and combined indices using matrix operations
+            index = item.T @ D @ item
+            index2 = item.T @ C @ item
+            index3 = item.T @ fi @ item
             
-        Returns:
-            DataFrame with index values and predictions
-        """
-        try:
-            projected = self.pca.transform(data)
-        except:
-            projected = np.array(data)
+            T2.append(index)
+            Q.append(index2)
+            combined.append(index3)
+            
+            # Make health predictions based on thresholds
+            pred_t2.append('Unhealthy' if index > t2_threshold else 'Healthy')
+            pred_Q.append('Unhealthy' if index2 > Q_alpha else 'Healthy')
+            pred_combined.append('Unhealthy' if index3 > threshold_combined else 'Healthy')
+            
+    except:
+        # Fallback: use data directly without PCA transformation
+        for item in np.array(data_transformed):
+            # Calculate indices using matrix operations
+            index = item.T @ D @ item
+            index2 = item.T @ C @ item
+            index3 = item.T @ fi @ item
+            
+            T2.append(index)
+            Q.append(index2)
+            combined.append(index3)
+            
+            # Make health predictions based on thresholds
+            pred_t2.append('Unhealthy' if index > t2_threshold else 'Healthy')
+            pred_Q.append('Unhealthy' if index2 > Q_alpha else 'Healthy')
+            pred_combined.append('Unhealthy' if index3 > threshold_combined else 'Healthy')
+    
+    # Create results DataFrame
+    return pd.DataFrame(
+        zip(data_transformed.index, T2, pred_t2, Q, pred_Q, combined, pred_combined),
+        columns=['SampleID', 'T2', 'Prediction T2', 'Q', 'Prediction Q', 'Combined Index', 'Combined Prediction']
+    )
+
+
+def calculate_hiPCA(path_, data):
+    """
+    Main function to calculate hiPCA results for given data.
+    
+    Args:
+        path_: Path to model directory containing required files
+        data: Input DataFrame with species abundance data
         
-        results = []
-        for sample in projected:
-            # Calculate all three indexes
-            t2 = sample.T @ self.D @ sample
-            q = sample.T @ self.C @ sample
-            combined = sample.T @ self.fi @ sample
-            
-            # Make predictions
-            pred_t2 = 'Healthy' if t2 <= self.t2_threshold else 'Unhealthy'
-            pred_q = 'Healthy' if q <= self.Q_alpha else 'Unhealthy'
-            pred_combined = 'Healthy' if combined <= self.threshold_combined else 'Unhealthy'
-            
-            results.append({
-                'T2': t2,
-                'Prediction T2': pred_t2,
-                'Q': q,
-                'Prediction Q': pred_q,
-                'Combined Index': combined,
-                'Combined Prediction': pred_combined
-            })
-        
-        return pd.DataFrame(results, index=data.index)
+    Returns:
+        DataFrame with hiPCA analysis results
+    """
+    global path
+    path = path_
+    data = transform_data(data)
+    results = calculate_index(data)
+    return results
+
 
 def main():
-    """Main execution function"""
-    parser = argparse.ArgumentParser(
-        description="Evaluate samples using a pre-trained hiPCA model"
-    )
-    parser.add_argument(
-        "--path", 
-        required=True, 
-        help="Path to the model directory"
-    )
-    parser.add_argument(
-        "--input", 
-        required=True, 
-        help="Path to the input data file"
-    )
-    parser.add_argument(
-        "--outdir", 
-        required=True, 
-        help="Path to the output directory"
-    )
+    """
+    Command-line interface for hiPCA analysis.
+    Processes input file and saves results to specified output directory.
+    """
+    # Set up command-line argument parser
+    parser = argparse.ArgumentParser(description="hiPCA health index analysis script")
+    parser.add_argument("--path", required=True, type=str, help="Path to the model directory")
+    parser.add_argument("--input", required=True, type=str, help="Path to the input file")
+    parser.add_argument("--outdir", required=True, type=str, help="Path to the output directory")
     args = parser.parse_args()
+    
+    # Set global path variable
+    global path
+    path = args.path
+    
+    # Load input data (tab-separated format expected)
+    data = pd.read_csv(args.input, sep='\t', index_col=0)
+    
+    # Transform data and calculate health indices
+    data = transform_data(data)
+    results = calculate_index(data)
+    
+    # Save results to output directory
+    results.to_csv(args.outdir.replace('/', '') + '/hiPCA_results.csv')
 
-    # Initialize evaluator
-    evaluator = HiPCAEvaluator(args.path)
-    
-    # Load and process data
-    raw_data = pd.read_csv(args.input, sep='\t', index_col=0)
-    transformed_data = evaluator.transform_data(raw_data)
-    
-    # Calculate indexes and save results
-    results = evaluator.calculate_indexes(transformed_data)
-    results.to_csv(Path(args.outdir) / 'hiPCA_results.csv')
 
 if __name__ == "__main__":
     main()
