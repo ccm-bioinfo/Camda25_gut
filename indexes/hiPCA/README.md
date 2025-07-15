@@ -11,13 +11,13 @@ hiPCA is a statistical framework for personalized health monitoring using gut mi
 
 ## Scripts Overview
 
-### 1. `train_hipca.py`
+### 1. `hiPCA_train.py`
 
 **Purpose**: Train a new hiPCA model using microbiome data
 
 **Usage**:
 ```bash
-python train_hipca.py \
+python hiPCA_train.py \
   --model_name my_model \
   --input microbiome_data.tsv \
   --metadata sample_metadata.tsv \
@@ -38,13 +38,13 @@ python train_hipca.py \
   - Threshold values
   - Feature matrices
 
-### 2. `evaluate_hipca.py`
+### 2. `hiPCA_calculate.py`
 
 **Purpose**: Evaluate new samples using a pre-trained hiPCA model
 
 **Usage**:
 ```bash
-python evaluate_hipca.py \
+python hiPCA_calculate.py \
   --path model_data/my_model \
   --input new_samples.tsv \
   --outdir results
@@ -59,27 +59,74 @@ python evaluate_hipca.py \
   - T², Q, and Combined index values
   - Health predictions for each sample
 
-### 3. `hipca_utils.py`
+### 3. `hiPCA_evaluate_kfolds.py`
 
-**Purpose**: Core hiPCA functionality (used by other scripts)
+**Purpose**: Perform 5-fold stratified cross-validation evaluation of hiPCA model
 
-**Contains**:
-- Data transformation functions
-- PCA modeling
-- Index calculations
-- Statistical methods
+**Usage**:
+```bash
+python hiPCA_evaluate_kfolds.py \
+  --input microbiome_data.tsv \
+  --metadata sample_metadata.tsv \
+  --sample_col sample_id \
+  --diagnosis_col health_status \
+  --control_label healthy \
+  --outdir kfold_results
+```
+
+**Inputs**:
+- Same inputs as training script
+- Uses stratified 5-fold cross-validation to ensure balanced splits
+
+**Outputs**:
+- Cross-validation performance metrics
+- Per-fold results and statistics
+- Overall model performance assessment
+
+
+
+## Model Data Structure
+
+The `model_data/` folder contains saved model components for each trained hiPCA model:
+
+```
+model_data/
+└── model_name/
+    ├── pca_model.pkl          # Trained PCA model
+    ├── scaler.pkl             # Data scaling parameters
+    ├── thresholds.json         # T² and Q threshold values
+    ├── feature_matrices.npy     # Processed feature data
+    └── scaling_parameters.pkl    # Data to scale the features
+
+```
+
+**Key Files**:
+- **pca_model.pkl**: Scikit-learn PCA model with fitted parameters
+- **scaler.pkl**: StandardScaler or other normalization parameters
+- **thresholds.pkl**: Statistical thresholds for T² and Q indexes
+- **feature_matrix.pkl**: Transformed feature data used for training
+- **control_indices.pkl**: Indices of control samples used for threshold calculation
+- **metadata.pkl**: Training parameters and model configuration
+
+These files are automatically created during training and loaded during evaluation to ensure consistent data processing and model application.
 
 ## Example Workflow
 
 1. **Train a model**:
 ```bash
-python train_hipca.py --model_name gut_health --input gut_data.tsv \
+python hiPCA_train.py --model_name gut_health --input gut_data.tsv \
   --metadata metadata.csv --sample_col sample --diagnosis_col status --control_label healthy
 ```
 
-2. **Evaluate new samples**:
+2. **Evaluate model performance with k-fold cross-validation**:
 ```bash
-python evaluate_hipca.py --path model_data/gut_health --input new_samples.tsv --outdir patient_results
+python hiPCA_evaluate_kfolds.py --input gut_data.tsv --metadata metadata.csv \
+  --sample_col sample --diagnosis_col status --control_label healthy --outdir cv_results
+```
+
+3. **Calculate indexes for new samples**:
+```bash
+python hiPCA_calculate.py --path model_data/gut_health --input new_samples.tsv --outdir patient_results
 ```
 
 ## Requirements
