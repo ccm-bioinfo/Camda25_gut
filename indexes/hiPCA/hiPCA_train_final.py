@@ -418,6 +418,7 @@ def main():
     
     # Load data and metadata
     data = pd.read_csv(f'{args.input}', sep='\t', index_col=0)
+    print(data)
     metadata = pd.read_csv(f'{args.metadata}', sep='\t')
 
     # Identify healthy and non-healthy samples

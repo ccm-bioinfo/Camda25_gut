@@ -21,9 +21,9 @@ python hiPCA_train.py \
   --model_name my_model \
   --input microbiome_data.tsv \
   --metadata sample_metadata.tsv \
-  --sample_col sample_id \
-  --diagnosis_col health_status \
-  --control_label healthy
+  --sample sample_id \
+  --diagnosis health_status \
+  --control healthy
 ```
 
 **Inputs**:
@@ -68,9 +68,9 @@ python hiPCA_calculate.py \
 python hiPCA_evaluate_kfolds.py \
   --input microbiome_data.tsv \
   --metadata sample_metadata.tsv \
-  --sample_col sample_id \
-  --diagnosis_col health_status \
-  --control_label healthy \
+  --sample sample_id \
+  --diagnosis health_status \
+  --control healthy \
   --outdir kfold_results
 ```
 
@@ -82,8 +82,6 @@ python hiPCA_evaluate_kfolds.py \
 - Cross-validation performance metrics
 - Per-fold results and statistics
 - Overall model performance assessment
-
-
 
 ## Model Data Structure
 
@@ -115,13 +113,13 @@ These files are automatically created during training and loaded during evaluati
 1. **Train a model**:
 ```bash
 python hiPCA_train.py --model_name gut_health --input gut_data.tsv \
-  --metadata metadata.csv --sample_col sample --diagnosis_col status --control_label healthy
+  --metadata metadata.csv --sample sample --diagnosis status --control healthy
 ```
 
 2. **Evaluate model performance with k-fold cross-validation**:
 ```bash
 python hiPCA_evaluate_kfolds.py --input gut_data.tsv --metadata metadata.csv \
-  --sample_col sample --diagnosis_col status --control_label healthy --outdir cv_results
+  --sample sample --diagnosis status --control healthy --outdir cv_results
 ```
 
 3. **Calculate indexes for new samples**:
