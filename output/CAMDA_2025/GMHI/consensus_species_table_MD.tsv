@@ -1,0 +1,300 @@
+Healthy_species	Unhealthy_species
+Abiotrophia_defectiva	Acidaminococcus_fermentans
+Abiotrophia_sp_HMSC24B09	Acidaminococcus_sp_CAG_542
+Absiella_dolichum	Alistipes_inops
+Acinetobacter_johnsonii	Alistipes_sp_CHKCI003
+Acinetobacter_parvus	Atopobium_deltae
+Acinetobacter_ursingii	Atopobium_minutum
+Actinomyces_cardiffensis	Atopobium_vaginae
+Actinomyces_georgiae	Bacteroides_salanitronis
+Actinomyces_graevenitzii	Bacteroides_sp_CAG_661
+Actinomyces_hongkongensis	Bacteroides_sp_CAG_927
+Actinomyces_johnsonii	Bifidobacterium_angulatum
+Actinomyces_naeslundii	Bifidobacterium_pullorum
+Actinomyces_odontolyticus	Candidatus_Methanomassiliicoccus_intestinalis
+Actinomyces_oris	Catenibacterium_mitsuokai
+Actinomyces_radicidentis	Clostridium_baratii
+Actinomyces_sp_HMSC035G02	Clostridium_sp_CAG_411
+Actinomyces_sp_ICM47	Clostridium_sp_MSTE9
+Actinomyces_sp_S6_Spd3	Clostridium_ventriculi
+Actinomyces_sp_oral_taxon_180	Collinsella_massiliensis
+Actinomyces_sp_oral_taxon_181	Corynebacterium_accolens
+Actinomyces_sp_oral_taxon_414	Denitrobacterium_detoxificans
+Actinomyces_sp_oral_taxon_448	Desulfovibrio_legallii
+Actinomyces_sp_oral_taxon_897	Desulfovibrionaceae_bacterium
+Actinomyces_turicensis	Dialister_succinatiphilus
+Actinotignum_timonense	Eubacterium_maltosivorans
+Aerococcus_urinaeequi	Eubacterium_sp_An11
+Aerococcus_viridans	Fusobacterium_sp_CAG_439
+Aeromonas_allosaccharophila	Hafnia_alvei
+Aeromonas_caviae	Halomonas_boliviensis
+Aeromonas_dhakensis	Lachnoclostridium_sp_An196
+Aeromonas_media	Lactobacillus_acidophilus
+Aeromonas_veronii	Lactobacillus_amylovorus
+Aggregatibacter_aphrophilus	Lactobacillus_animalis
+Aggregatibacter_segnis	Lactobacillus_antri
+Aggregatibacter_sp_oral_taxon_458	Lactobacillus_farciminis
+Alkaliphilus_oremlandii	Lactobacillus_gasseri
+Alloprevotella_tannerae	Lactobacillus_helveticus
+Anaerofilum_sp_An201	Lactobacillus_reuteri
+Anaeromassilibacillus_sp_An172	Megasphaera_sp_MJR8396C
+Atopobium_parvulum	Methanobrevibacter_arboriphilus
+Atopobium_rimae	Mitsuokella_jalaludinii
+Bacillus_cereus_group	Odoribacter_laneus
+Bacillus_sp_FJAT_27916	Peptoniphilus_coxii
+Bacteroides_caecimuris	Peptoniphilus_duerdenii
+Bacteroides_coprocola	Peptoniphilus_sp_HMSC062D09
+Bacteroides_coprophilus	Porphyromonas_sp_HMSC065F10
+Bacteroides_faecichinchillae	Prevotella_colorans
+Bacteroides_oleiciplenus	Prevotella_multisaccharivorax
+Bacteroides_pectinophilus	Prevotella_sp_CAG_617
+Bacteroides_plebeius	Prevotella_sp_CAG_873
+Bacteroides_pyogenes	Prevotella_sp_S7_1_8
+Bacteroides_sp_43_108	Propionibacterium_freudenreichii
+Bacteroides_sp_OM05_12	Pyramidobacter_sp_C12_8
+Bifidobacterium_merycicum	Slackia_isoflavoniconvertens
+Bifidobacterium_pseudocatenulatum	Streptococcus_sp_HMSC070B10
+Bifidobacterium_ruminantium	Tissierellia_bacterium_KA00581
+Bifidobacterium_scardovii	Tropheryma_whipplei
+Blastocystis_sp_subtype_1	Vibrio_kanaloae
+Brachyspira_pilosicoli	
+Brachyspira_sp_CAG_700	
+Bulleidia_extructa	
+Butyribacterium_methylotrophicum	
+Butyricicoccus_pullicaecorum	
+Campylobacter_concisus	
+Campylobacter_gracilis	
+Campylobacter_jejuni	
+Campylobacter_showae	
+Campylobacter_ureolyticus	
+Candidatus_Gastranaerophilales_bacterium_HUM_9	
+Candidatus_Stoquefichus_sp_KLE1796	
+Carnobacterium_divergens	
+Carnobacterium_maltaromaticum	
+Cetobacterium_somerae	
+Citrobacter_europaeus	
+Citrobacter_freundii	
+Citrobacter_koseri	
+Citrobacter_pasteurii	
+Citrobacter_portucalensis	
+Citrobacter_werkmanii	
+Citrobacter_youngae	
+Clostridium_butyricum	
+Clostridium_hiranonis	
+Clostridium_hylemonae	
+Clostridium_paraputrificum	
+Clostridium_perfringens	
+Clostridium_sp_CAG_510	
+Clostridium_sp_CAG_590	
+Clostridium_sp_CAG_632	
+Clostridium_sp_chh4_2	
+Comamonas_kerstersii	
+Coprobacter_sp	
+Corynebacterium_casei	
+Corynebacterium_durum	
+Corynebacterium_glutamicum	
+Corynebacterium_variabile	
+Cronobacter_malonaticus	
+Cutibacterium_acnes	
+Desulfovibrio_vulgaris	
+Dialister_pneumosintes	
+Dialister_sp_CAG_357	
+Dysgonomonas_sp_37_18	
+Eggerthia_catenaformis	
+Eikenella_corrodens	
+Elizabethkingia_anophelis	
+Enterobacter_bugandensis	
+Enterobacter_cloacae_complex	
+Enterobacter_soli	
+Enterococcus_devriesei	
+Enterococcus_hirae	
+Enterococcus_malodoratus	
+Enterococcus_mundtii	
+Enterococcus_raffinosus	
+Escherichia_albertii	
+Escherichia_fergusonii	
+Eubacterium_brachy	
+Eubacterium_coprostanoligenes	
+Eubacterium_dolichum_CAG_375	
+Eubacterium_infirmum	
+Eubacterium_saphenum	
+Eubacterium_sp_CAG_786	
+Eubacterium_sulci	
+Filifactor_alocis	
+Firmicutes_bacterium_CAG_534	
+Firmicutes_bacterium_CAG_646	
+Flavonifractor_sp_An82	
+Fusobacterium_mortiferum	
+Fusobacterium_naviforme	
+Fusobacterium_necrophorum	
+Fusobacterium_nucleatum	
+Fusobacterium_periodonticum	
+Fusobacterium_ulcerans	
+Gemella_haemolysans	
+Gemella_morbillorum	
+Gemella_sanguinis	
+Gemmiger_sp_An120	
+Gemmiger_sp_An194	
+Gemmiger_sp_An50	
+Gemmiger_sp_An87	
+Geobacillus_stearothermophilus	
+Granulicatella_adiacens	
+Granulicatella_elegans	
+Haemophilus_parainfluenzae	
+Haemophilus_paraphrohaemolyticus	
+Haemophilus_sputorum	
+Helicobacter_cinaedi	
+Helicobacter_pullorum	
+Hungatella_effluvii	
+Klebsiella_aerogenes	
+Klebsiella_pneumoniae	
+Klebsiella_quasipneumoniae	
+Klebsiella_variicola	
+Kluyvera_ascorbata	
+Kluyvera_cryocrescens	
+Kluyvera_georgiana	
+Kluyvera_intestini	
+Kosakonia_sacchari	
+Lachnoanaerobaculum_saburreum	
+Lachnospiraceae_bacterium_2_1_46FAA	
+Lachnospiraceae_bacterium_oral_taxon_096	
+Lactobacillus_algidus	
+Lactobacillus_mindensis	
+Lactobacillus_murinus	
+Lactobacillus_parabuchneri	
+Lactobacillus_pentosus	
+Lactobacillus_sanfranciscensis	
+Lactococcus_garvieae	
+Lactococcus_piscium	
+Lactococcus_raffinolactis	
+Lactonifactor_longoviformis	
+Lautropia_mirabilis	
+Leclercia_adecarboxylata	
+Leptotrichia_hofstadii	
+Leptotrichia_wadei	
+Leuconostoc_citreum	
+Leuconostoc_garlicum	
+Leuconostoc_gelidum	
+Leuconostoc_suionicum	
+Massiliomicrobiota_timonensis	
+Megamonas_funiformis	
+Megamonas_funiformis_CAG_377	
+Megamonas_hypermegale	
+Megasphaera_cerevisiae	
+Megasphaera_micronuciformis	
+Meiothermus_silvanus	
+Methanobrevibacter_woesei	
+Methanosphaera_cuniculi	
+Mogibacterium_diversum	
+Mogibacterium_pumilum	
+Mogibacterium_timidum	
+Morococcus_cerebrosus	
+Neisseria_macacae	
+Neisseria_mucosa	
+Neisseria_sicca	
+Olsenella_uli	
+Oribacterium_asaccharolyticum	
+Oribacterium_parvum	
+Oribacterium_sinus	
+Parabacteroides_chinchillae	
+Paraclostridium_bifermentans	
+Parvimonas_micra	
+Parvimonas_sp_KA00067	
+Parvimonas_sp_oral_taxon_393	
+Peptococcus_niger	
+Peptostreptococcus_anaerobius	
+Peptostreptococcus_stomatis	
+Phytobacter_ursingii	
+Porphyromonas_endodontalis	
+Porphyromonas_gingivalis	
+Porphyromonas_somerae	
+Porphyromonas_uenonis	
+Prevotella_denticola	
+Prevotella_intermedia	
+Prevotella_melaninogenica	
+Prevotella_nigrescens	
+Prevotella_oralis	
+Prevotella_pallens	
+Prevotella_sp_F0091	
+Prevotella_sp_oral_taxon_473	
+Prevotella_stercorea	
+Propionibacterium_acidifaciens	
+Proteus_mirabilis	
+Providencia_rettgeri	
+Pseudomonas_fluorescens_group	
+Pseudomonas_fragi	
+Pseudomonas_lundensis	
+Pseudomonas_yamanorum	
+Pseudopropionibacterium_propionicum	
+Pyrococcus_yayanosii	
+Ralstonia_pickettii	
+Rhodococcus_erythropolis	
+Rhodococcus_qingshengii	
+Rikenella_microfusus	
+Roseburia_sp_831b	
+Roseburia_sp_CAG_303	
+Rothia_aeria	
+Rothia_dentocariosa	
+Rothia_mucilaginosa	
+Ruminococcus_champanellensis	
+Ruminococcus_sp_CAG_579	
+Scardovia_inopinata	
+Selenomonas_flueggei	
+Selenomonas_noxia	
+Selenomonas_sputigena	
+Sellimonas_intestinalis	
+Shuttleworthia_satelles	
+Sneathia_amnii	
+Solobacterium_moorei	
+Staphylococcus_capitis	
+Staphylococcus_equorum	
+Staphylococcus_gallinarum	
+Staphylococcus_hominis	
+Staphylococcus_kloosii	
+Staphylococcus_sciuri	
+Staphylococcus_xylosus	
+Stenotrophomonas_maltophilia	
+Stenotrophomonas_rhizophila	
+Streptococcus_agalactiae	
+Streptococcus_australis	
+Streptococcus_cristatus	
+Streptococcus_downei	
+Streptococcus_equinus	
+Streptococcus_infantis	
+Streptococcus_macedonicus	
+Streptococcus_milleri	
+Streptococcus_mitis	
+Streptococcus_oralis	
+Streptococcus_pseudopneumoniae	
+Streptococcus_pyogenes	
+Streptococcus_sanguinis	
+Streptococcus_sinensis	
+Streptococcus_sp_A12	
+Streptococcus_sp_F0442	
+Streptococcus_sp_HMSC034E03	
+Streptococcus_sp_HMSC067H01	
+Streptococcus_sp_HMSC071D03	
+Streptococcus_sp_HPH0090	
+Streptococcus_sp_M334	
+Streptococcus_sp_NLAE_zl_C503	
+Streptococcus_sp_oral_taxon_056	
+Streptococcus_viridans	
+Synergistes_jonesii	
+Terrisporobacter_othiniensis	
+Treponema_berlinense	
+Treponema_porcinum	
+Treponema_succinifaciens	
+Tyzzerella_nexilis	
+Tyzzerella_sp_An114	
+Variovorax_paradoxus	
+Veillonella_atypica	
+Veillonella_dispar	
+Veillonella_infantium	
+Veillonella_parvula	
+Veillonella_rogosae	
+Veillonella_sp_CAG_933	
+Veillonella_sp_T11011_6	
+Veillonella_tobetsuensis	
+Weissella_cibaria	
+Weissella_confusa	
+[Collinsella]_massiliensis	

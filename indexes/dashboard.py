@@ -3,6 +3,7 @@ import pandas as pd
 from hiPCA import calculate_hiPCA
 from RF_GMHI import get_all_GMHI
 import joblib
+import json
 
 st.title("Gut Microbiome Health Calculator")
 
@@ -75,7 +76,7 @@ with tab1:
         st.write("Preview of the uploaded file:")
         st.write(data.head(3))
 
-        models = {'ORIGINAL MODEL (ZHU et al)':'zhu_model', 'CAMDA MODEL 2024':'camda_all_samples', 'CAMDA MODEL 2025':'CAMDA2025_ALL_SAMPLES', 'GASTRO INTESTINAL CAMDA MODEL 2025':'CAMDA2025_GI_SAMPLES'}
+        models = {'ORIGINAL MODEL (ZHU et al)':'zhu_model', 'CAMDA MODEL 2024':'camda_all_samples', 'CAMDA MODEL 2025':'CAMDA2025_ALL_SAMPLES', 'INFECTIOUS DISEASES':'ID_CAMDA_2025', 'MENTAL OR BEHAVIORAL DISORDERS':'MBD_CAMDA_2025'}
         selected_model = st.selectbox("Select a model to use:", list(models.keys()))
 
         if st.button("Run hiPCA Calculation"):
@@ -113,11 +114,18 @@ with tab2:
         st.write("Preview of the GMHI file:")
         st.write(gmhi_data.head(3))
 
-        models = {'ORIGINAL MODEL':'RF_GMHI/model_data/taxonomy_original.csv', 'CAMDA MODEL':'RF_GMHI/model_data/taxonomy.csv', 'CAMDA MODEL 2025':'RF_GMHI/model_data/taxonomy_camda2025_all.csv'}
+        models = {'ORIGINAL MODEL':'RF_GMHI/model_data/taxonomy_original.csv', 'CAMDA MODEL':'RF_GMHI/model_data/taxonomy.csv', 'CAMDA MODEL 2025':'RF_GMHI/model_data/taxonomy_camda2025_all.csv', 'INFECTIOUS DISEASES':'RF_GMHI/model_data/species_ID.tsv', 'MENTAL OR BEHAVIORAL DISORDERS':'RF_GMHI/model_data/species_MBD.tsv'}
         selected_model = st.selectbox("Select a model to use:", list(models.keys()))
 
-        taxonomy = pd.read_csv(f"{models[selected_model]}")
-        MH_tax, MN_tax = set(taxonomy['Healthy']), set(taxonomy['Unhealthy'])
+        if selected_model in ['INFECTIOUS DISEASES', 'MENTAL OR BEHAVIORAL DISORDERS']:
+
+            # Load taxonomy data for the selected model
+            # This assumes the taxonomy file is in the format expected by get_all_GMHI
+            taxonomy = pd.read_csv(f"{models[selected_model]}", sep='\t')
+            MH_tax, MN_tax = set(taxonomy['Healthy_species']), set(taxonomy['Unhealthy_species'])
+        else:
+            taxonomy = pd.read_csv(f"{models[selected_model]}")
+            MH_tax, MN_tax = set(taxonomy['Healthy']), set(taxonomy['Unhealthy'])
 
         if st.button("Run GMHI Calculation"):
             gmhi_results = get_all_GMHI(gmhi_data, MH_tax, MN_tax)
@@ -156,36 +164,90 @@ with tab2:
             st.write("Preview of the pathways file:")
             st.write(pathways_data.head(3))
 
-            # models = {'ORIGINAL MODEL':'RF_GMHI/model_data/taxonomy_original.csv', 'CAMDA MODEL':'RF_GMHI/model_data/taxonomy.csv', 'CAMDA MODEL 2025':'RF_GMHI/model_data/taxonomy_camda2025_all.csv'}
-        
-            taxonomy = pd.read_csv('RF_GMHI/model_data/taxonomy_camda2025_all.csv')
-            MH_tax, MN_tax = set(taxonomy['Healthy']), set(taxonomy['Unhealthy'])
+            models = {'Infectious Diseases':'ID', 'Mental or Behavioral Disorders':'MBD'}
+            selected_model = st.selectbox("Select a model to use:", list(models.keys()))
+            taxonomy = pd.read_csv(f'RF_GMHI/model_data/species_{models[selected_model]}.tsv', sep='\t')
+            MH_tax, MN_tax = set(taxonomy['Healthy_species']), set(taxonomy['Unhealthy_species'])
 
 
 
             if st.button("Run Calculation"):
                 gmhi_results = get_all_GMHI(tax_data, MH_tax, MN_tax)
-                hiPCA_results = calculate_hiPCA(f'hiPCA/model_data/CAMDA2025_ALL_SAMPLES',tax_data)
+                hiPCA_results = calculate_hiPCA(f'hiPCA/model_data/{models[selected_model]}_CAMDA_2025',tax_data)
 
-                new_data = pd.DataFrame(zip(gmhi_results, hiPCA_results['Combined Index']))
-                new_data.columns = ['GMHI_taxonomy', 'hiPCA_taxonomy']
-                pathways = pd.read_csv('ENSEMBLE/op_ensemble_model/pathways.tsv', sep = '\t')
+                with open('ENSEMBLE/models/pathways_classification.json', 'r') as json_file:
+                    pathway_class = json.load(json_file)
+
+                
+
+                # st.write(pathway_class)
+
+                pathways_data['name'] = pathways_data.index.str.split(':').str[0]
+
+                # Create a reverse mapping dictionary (value → key)
+                reverse_mapping = {}
+                for key, values in pathway_class.items():
+                    for value in values:
+                        reverse_mapping[value] = key
+
+                # Add new column by mapping the index to categories
+                pathways_data['category'] = pathways_data['name'].map(reverse_mapping).fillna('uncategorized')
+
+                # print(pathways_data)
+                pathways_data = pathways_data.groupby('category').sum()
+
+                all_categories = list(pathway_class.keys())
+                if pathways_data.shape[1] < len(all_categories):
+                    for category in all_categories:
+                        if category not in pathways_data.columns:
+                            pathways_data[category] = 0
+            
+
+                # st.write(pathways_data)
+
+
+
+                new_data = pd.DataFrame(zip(hiPCA_results['T2'], hiPCA_results['Q'],  hiPCA_results['Combined Index'], gmhi_results))
+                new_data.columns = ['T2', 'Q', 'Combined Index', 'GMHI']
+                new_data.index = tax_data.columns
+                new_data = new_data.join(pathways_data.T, how='inner')
+                new_data = new_data[['T2', 'Q', 'Combined Index', 'GMHI',
+                            'Biosynthesis_of_Cofactors_and_Vitamins', 'Carbohydrate_metabolism',
+                            'Cellular_Structure_and_Modification_of_Macromolecules',
+                            'Central_metabolism_and_energy', 'Lipid_metabolism',
+                            'Metabolism_of_Alcohols_and_Aldehydes',
+                            'Metabolism_of_Aromatic_Compounds_and_Xenobiotics',
+                            'Metabolism_of_Carboxylic_Acids',
+                            'Metabolism_of_amino_acids_and_derivatives',
+                            'Nucleotide_and_Nucleic_Acid_Metabolism',
+                            'Signaling_and_Regulation_Metabolism',
+                            'Specialized_and_Miscellaneous_Routes']]
+
+
+
+
+                # st.write(new_data)
+                # new_data.columns = ['GMHI_taxonomy', 'hiPCA_taxonomy']
+                # pathways = pd.read_csv('ENSEMBLE/op_ensemble_model/pathways.tsv', sep = '\t')
                 # st.write(pathways_data.T.columns)
-                for path in pathways['pathways']:
-                    try:
-                        new_data[path.split(':')[0]] = list(pathways_data.T[path])
-                    except:
-                        new_data[path.split(':')[0]] = [0 for _ in range(len(new_data))]
+                # for path in pathways['pathways']:
+                #     try:
+                #         new_data[path.split(':')[0]] = list(pathways_data.T[path])
+                #     except:
+                #         new_data[path.split(':')[0]] = [0 for _ in range(len(new_data))]
 
                 # st.write(new_data)
 
-                model = joblib.load('ENSEMBLE/op_ensemble_model/model.pkl')
-                preds = ['Healthy' if x == 1 else 'Unhealthy' for x in model.predict(new_data)]
+                model = joblib.load(f'ENSEMBLE/models/{models[selected_model]}_model.pkl')
+
+                # preds = ['Healthy' if x == 1 else 'Unhealthy' for x in model.predict(new_data)]
+                preds = [x for x in model.predict(new_data)]
                 index = [x[1] if x[1] > x[0] else -x[0] for x in model.predict_proba(new_data)]
+                # index = [max(x) for x in model.predict_proba(new_data)]
                 new_data['Model Index'] = index
                 new_data['Model Prediction'] = preds
 
-                st.write("Results of GMHI calculation:")
+                st.write("Results of ENSEMBLE model calculation:")
                 st.write(new_data)
                 # st.write(hiPCA_results)
 

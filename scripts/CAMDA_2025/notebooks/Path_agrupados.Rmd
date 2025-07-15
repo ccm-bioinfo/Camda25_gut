@@ -1,0 +1,193 @@
+---
+title: "Pathways"
+author: "QuetzallyMed"
+date: "2025-06-11"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Program Files/Git/Camda25_gut")
+
+library(tidyverse)
+library(fuzzyjoin)
+library(stringr)
+```
+
+```{r}
+getwd()
+
+path <- read.csv("DataSets/CAMDA_2025/pathways.txt", sep = "\t")
+samp <- read.csv("DataSets/CAMDA_2025/metadata_corrected_final.txt", sep = "\t")
+type_path <- read.csv("DataSets/CAMDA_2025/Pathways_Types_complete.txt", sep = "\t")
+```
+
+```{r}
+t <- t(path)
+
+colnames(t) <- as.character(t[1, ])
+t <- t[-1, ]
+t <- as.data.frame(t)
+
+t <- rownames_to_column(t, var = "sample")
+
+merg <- samp %>% select(sample, Group) %>% 
+  merge(t, by = "sample")
+
+
+long <- merg %>%
+  pivot_longer(
+    cols = matches(":"),     
+    names_to = "Object.ID",
+    values_to = "value"
+  )
+
+```
+
+```{r}
+joined <- long %>%
+  regex_left_join(
+    type_path %>% select(Object.ID, General_Pathway_Type),
+    by = c("Object.ID" = "Object.ID")  # Coincidencia parcial
+  )
+
+no_match <- joined %>%
+  filter(is.na(General_Pathway_Type))
+
+unique(no_match$Object.ID.x)
+
+# Agrupar y sumar los valores por sample, group y type
+joined$value <- as.numeric(joined$value)
+
+grouped <- joined %>%
+  group_by(sample, Group, General_Pathway_Type) %>%
+  summarise(total = sum(value), .groups = "drop")
+
+# Volver a formato ancho
+Path_grouped <- grouped %>%
+  pivot_wider(
+    names_from = General_Pathway_Type,
+    values_from = total
+  )
+
+# Crear carpeta si no existe
+if (!dir.exists("DataSets/CAMDA_2025/densidad_pathways")) {
+  dir.create("DataSets/CAMDA_2025/densidad_pathways")
+}
+
+write.table(Path_grouped, file = "DataSets/CAMDA_2025/Path_agrupados.txt", row.names = FALSE, quote = FALSE)
+
+# Lista de columnas numéricas a graficar
+columns_to_plot <- unique(grouped$General_Pathway_Type)
+
+# Definir la paleta de colores (la misma que antes)
+group_colors <- c(
+  'ID' = '#56B4E9',   
+  'NP' = '#E69F00',    
+  'MD' = '#0072B2',    
+  'MBD' = '#CC79A7',  
+  'CD' = '#F0E442',   
+  'DD' = '#D55E00',    
+  'H' = '#009E73'
+)
+
+# Loop modificado con la paleta de colores
+for (col_name in columns_to_plot) {
+  p <- ggplot(Path_grouped %>% filter(Group != "delete"), 
+              aes_string(x = col_name, fill = "Group", color = "Group")) +
+    geom_density(alpha = 0.4) +
+    scale_fill_manual(values = group_colors) +  # Aplica colores de relleno
+    scale_color_manual(values = group_colors) + # Aplica colores de línea
+    labs(
+      title = paste(col_name),
+      x = "Total de valores",
+      y = "Densidad"
+    ) +
+    theme_minimal()
+
+  ggsave(
+    filename = paste0("DataSets/CAMDA_2025/densidad_pathways/", 
+                     gsub("[^a-zA-Z0-9]", "_", col_name), ".png"),
+    plot = p,
+    width = 8, 
+    height = 5
+  )
+
+  print(p)
+}
+
+```
+```{r}
+
+joined_Parental <- long %>%
+  regex_left_join(
+    type_path %>% select(Object.ID, Parental.Ontology.pathway_type),
+    by = c("Object.ID" = "Object.ID")  # Coincidencia parcial
+  )
+
+# Agrupar y sumar los valores por sample, group y type
+
+joined_Parental$value <- as.numeric(joined_Parental$value)
+
+grouped_Parental <- joined_Parental %>%
+  group_by(sample, Group, Parental.Ontology.pathway_type) %>%
+  summarise(total = sum(value), .groups = "drop")
+
+# Volver a formato ancho
+Path_grouped_P <- grouped_Parental %>%
+  pivot_wider(
+    names_from = Parental.Ontology.pathway_type,
+    values_from = total
+  )
+
+# Crear carpeta si no existe
+if (!dir.exists("DataSets/CAMDA_2025/densidad_pathways")) {
+  dir.create("DataSets/CAMDA_2025/densidad_pathways")
+}
+
+write.table(Path_grouped_P, file = "DataSets/CAMDA_2025/Path_agrupados_Parental.txt", sep = "\t", row.names = FALSE, quote = FALSE)
+
+
+# Lista de columnas numéricas a graficar
+columns_to_plot <- unique(grouped_Parental$Parental.Ontology.pathway_type)
+
+
+# Definir la paleta de colores
+group_colors <- c(
+  'ID' = '#56B4E9',   
+  'NP' = '#E69F00',    
+  'MD' = '#0072B2',    
+  'MBD' = '#CC79A7',  
+  'CD' = '#F0E442',   
+  'DD' = '#D55E00',    
+  'H' = '#009E73'
+)
+
+# Loop para crear una gráfica por variable
+for (col_name in columns_to_plot) {
+  p <- ggplot(Path_grouped_P %>% filter(Group != "delete"), 
+              aes_string(x = col_name, fill = "Group", color = "Group")) +
+    geom_density(alpha = 0.4) +
+    scale_fill_manual(values = group_colors) +
+    scale_color_manual(values = group_colors) +
+    labs(
+      title = paste(col_name),
+      x = "Total de valores",
+      y = "Densidad"
+    ) +
+    theme_minimal()
+
+  ggsave(
+    filename = paste0("DataSets/CAMDA_2025/densidad_pathways/", 
+                     gsub("[^a-zA-Z0-9]", "_", col_name), "Parental.png"),
+    plot = p,
+    width = 8, 
+    height = 5
+  )
+
+  print(p)
+}
+
+```
