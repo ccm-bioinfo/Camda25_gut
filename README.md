@@ -1,96 +1,150 @@
-# Gut Microbiome Health Index Challenge (CAMDA 2024)
+# CAMDA Gut Microbiome Health Index Challenge Repository
 
 ## Overview
 
-This challenge aimed to develop a novel gut microbiome-based health index that surpasses existing indices in performance. We leveraged data from the Human Microbiome Project 2 and two American Gut Project cohorts, incorporating the Theatre of Activity concept to enhance our models.
+This repository contains the complete analysis pipeline and results for the CAMDA (Critical Assessment of Massive Data Analysis) Gut Microbiome Health Index Challenge, spanning both 2024 and 2025 competitions. The challenge focuses on developing novel approaches to assess microbiome health from stool samples, with emphasis on the **Theatre of Activity (ToA)** concept that considers not just microbiota but the entire ecosystem of microbiome functions and interactions.
 
-## Dataset Description
+## Repository Structure
 
-The dataset provided for the challenge includes 613 samples, sourced from:
+```
+├── DataSets/                    # Raw and processed datasets
+├── images/                      # Visualization outputs and figures
+├── indexes/                     # Health index models and implementations
+│   ├── dashboard.py             # 🌐 Interactive web calculator (streamlit run dashboard.py)
+│   ├── ENSEMBLE/
+│   ├── GMHI/
+│   └── hiPCA/
+├── output/                      # Analysis results and computed indices
+├── scripts/                     # Analysis scripts and notebooks
+└── README.md                   # This file
+```
 
-- **Human Microbiome Project 2**
-- **Two American Gut Project cohorts**
+## 📊 DataSets
 
-For each sample, the following data is provided:
-- **Taxonomic Profiles:** Including health predictions from existing indices (Shannon Entropy, GMHI, and hiPCA).
-- **Functional Profiles:** Detailing the microbial functions present in each sample.
+### CAMDA_2024 (613 samples)
+- **BrackenAnnotation/**: Taxonomic profiles using Bracken
+- **COVID/**: COVID-19 vs healthy classification dataset (35 patients)
+- **MetacycAnnotation/**: Functional pathway annotations
+  - `cummulative/`: Aggregated pathway data (scaled/unscaled)
+  - `noncummulative/`: Individual pathway data (scaled/unscaled)
+- **MifaserAnnotation/**: Alternative functional annotation using Mifaser
 
-Additionally we were provided with an additional dataset containing samples from 35 patients. The task is to explore the dataset and classify the patients into two groups: healthy controls and COVID-19 patients.
+### CAMDA_2025 (4,398 samples)
+- **networks/**: Network analysis data and adjacency matrices
+- **taxa_category/**: Taxonomic categorization and metadata
 
-Each patient has two samples:
-1. Sample from the day of admission.
-2. The last sample from the ward stay.
+### q2-dysbiosis_test
+- Additional test dataset for dysbiosis analysis
 
-The main objective of this challenge is to identify the healthy controls among the patients based on the provided dataset.
+## 🔬 Indexes
+
+Implementation and models for various microbiome health indices:
+
+### ENSEMBLE
+- Ensemble learning approaches combining multiple indices
+- `models/`: Trained ensemble models
+- `output/`: Ensemble predictions
+
+### GMHI (Gut Microbiome Health Index)
+- Original GMHI implementation and analysis
+- `model_data/`: Training data and bacterial species lists
+- `notebooks/`: Analysis notebooks
+- `output/`: GMHI scores and classifications
+
+### hiPCA
+- hiPCA index implementation with extensive model variations
+- `model_data/`: Contains multiple dataset variations:
+  - `zhu_model/`: Original Zhu et al. model implementation
+  - `camda_all_samples/`: Full 2024 dataset
+  - `ID_CAMDA_2025/`: Infectious disease-specific samples
+  - `MBD_CAMDA_2025/`: Mental disorder-specific samples
+
+## 📈 Output
+
+### CAMDA_2024 Results
+- **centrality_measures/**: Network centrality analysis
+- **differential_otus/**: Differentially abundant taxa
+- **GMHI/** & **hiPCA/**: Index calculations and scores
+- **INDEX/**: Combined index results
+  - `GMHI/`: GMHI-specific outputs
+  - `hiPCA/`: hiPCA-specific outputs
+- **Keystone/**: Keystone species analysis
+  - `connected_otus/`: Network connectivity analysis
+- **MD_index/**: MD index calculation scripts
+
+### CAMDA_2025 Results
+- **densidad_pathways/**: Pathway density analysis
+- **diversity_plots/**: Alpha and beta diversity visualizations
+- **GMHI/** & **hiPCA/**: List of species considered on each model
+- **networks/**: Network analysis outputs
+  - `centrality_measures/`: Node centrality metrics
+  - `generate_network/`: Network generation results
+  - `key.taxon_network_O_spcor_CAMDA25/`: Key taxon network analysis
+- **spieceasi_network/**: SPIEC-EASI network inference results
+
+## 🔍 Key Bacterial Species and Taxa
+
+### 🎯 **IMPORTANT: Bacterial Species Used in Index Calculations**
+
+For researchers interested in the specific bacterial species used in health index calculations:
 
 
-## Project Objectives
+#### Results and Bacterial Contributions
+- **CAMDA_2025 hiPCA Results**: `output/CAMDA_2025/hiPCA/`
+- **CAMDA_2025 GMHI Results**: `output/CAMDA_2025/GMHI/`
 
-Our primary objectives for this challenge were to:
-1. Develop a gut microbiome-based health index that outperforms existing indices.
-2. Utilize the Theatre of Activity concept to improve health predictions.
-3. Document our methods, results, and insights gained during the challenge.
 
-## Requirements
-- R (4.1.3)
-- Python (3.10.5)
+## 🚀 Getting Started
 
-### Python libraries
+### Prerequisites
+- R (version 4.0+)
+- Python (version 3.8+)
+- Streamlit (for web dashboard)
+- Required R packages: microbiome, phyloseq, vegan, igraph
+- Required Python packages: pandas, numpy, scikit-learn, networkx, streamlit
 
-To run this project, ensure you have the following Python libraries installed:
+
+### 🌐 **Interactive Web Dashboard**
+
+#### **Gut Microbiome Health Calculator**
+Run the interactive web application to easily calculate health indices using the developed models:
 
 ```bash
-pandas
-numpy
-json
-pickle
-scipy
-scikit-learn
-joblib
-```
-
-
-## Repository Contents
-
-```
-├── Camda25_gut
-│   ├── DataSets
-│   │   ├── CAMDA
-│   │   ├── COVID
-│   │   └── INDEX 
-│   ├── indexes
-│   │   ├── hiPCA
-│   │   └── RF_GMHI
-│   ├── output
-│   │   ├── hiPCA
-│   │   ├── GMHI
-│   │   └── MD_index
-│   └── scripts
-│       └── ...
-└── ...
-```
-
-## Run dashboard
-
-```bash
-git clone https://github.com/ccm-bioinfo/Camda25_gut.git
-cd Camda25_gut/indexes/
+cd indexes
 streamlit run dashboard.py
 ```
 
-## Running the hiPCA Index
+**Features:**
+- Interactive calculation of GMHI, hiPCA, and ensemble indices
+- Upload your own microbiome data
+- Easy-to-use interface for non-technical users
+- Comparison between different health indices
 
-To calculate the hiPCA index, you can use either the CAMDA model or the original Zhu model. Here’s how to run the script:
 
-   ```bash
-   cd Camda25_gut/indexes/hiPCA
-   python3 hiPCA_calculate.py --path model_data/{model}/ --input path/to/input --output output/directory/
-   ```
-## Running the GMHI Index
+## 📚 References
 
-To calculate the RF-GMHI index, follow these steps:
+- Gupta, V. K., et al. (2020). GMHI development
+- Zhu, Q., et al. (2023). hiPCA index methodology
+- Berg, G., et al. (2020). Theatre of Activity concept
+- Chang, Y., et al. (2024). GMWI2 advancement
 
-```bash
-cd Camda25_gut/indexes/RF-GMHI
-python3 gmhi_calculate.py --path model_data/ --taxonomy path/to/input/taxonomy --pathways path/to/input/pathways
-```
+## 🤝 Contributing
+
+This repository contains the complete analysis pipeline for the CAMDA challenges. Researchers can:
+- Explore the bacterial species used in index calculations
+- Reproduce the analysis using provided scripts
+- Use the **interactive web dashboard** (`cd indexes && streamlit run dashboard.py`) for easy index calculations
+- Extend the methodologies for new datasets
+- Develop novel health indices based on the Theatre of Activity concept
+
+## 🌐 Web Application Usage
+
+The `indexes/dashboard.py` provides an intuitive interface for:
+- **Researchers**: Quick validation of results and hypothesis testing
+- **Clinicians**: Easy-to-use tool for microbiome health assessment
+- **Students**: Educational tool for understanding microbiome indices
+- **Collaborators**: Sharing results and demonstrating methodologies
+
+## 📞 Contact
+
+For questions about the datasets, methodologies, or bacterial species used in calculations, please refer to the specific model data directories or contact the challenge organizers.
