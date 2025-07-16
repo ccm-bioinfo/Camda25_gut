@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from hiPCA import calculate_hiPCA
-from RF_GMHI import get_all_GMHI
+from GMHI import get_all_GMHI
 import joblib
 import json
 
