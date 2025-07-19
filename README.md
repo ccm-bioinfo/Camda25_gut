@@ -123,10 +123,11 @@ streamlit run dashboard.py
 
 ## 📚 References
 
-- Gupta, V. K., et al. (2020). GMHI development
-- Zhu, Q., et al. (2023). hiPCA index methodology
-- Berg, G., et al. (2020). Theatre of Activity concept
-- Chang, Y., et al. (2024). GMWI2 advancement
+- Gupta, V.K., Kim, M., Bakshi, U. *et al.* (2020). [A predictive index for health status using species-level gut microbiome profiling](https://doi.org/10.1038/s41467-020-18476-8). *Nature Communications*, 11, 4635.
+
+- Zhu, J., Xie, H., Yang, Z. *et al.* (2023). [Statistical modeling of gut microbiota for personalized health status monitoring](https://doi.org/10.1186/s40168-023-01614-x). *Microbiome*, 11, 184.
+
+- Berg, G., Rybakova, D., Fischer, D. *et al.* (2020). [Microbiome definition re-visited: old concepts and new challenges](https://doi.org/10.1186/s40168-020-00875-0). *Microbiome*, 8, 103.
 
 ## 🤝 Contributing
 
@@ -144,7 +145,3 @@ The `indexes/dashboard.py` provides an intuitive interface for:
 - **Clinicians**: Easy-to-use tool for microbiome health assessment
 - **Students**: Educational tool for understanding microbiome indices
 - **Collaborators**: Sharing results and demonstrating methodologies
-
-## 📞 Contact
-
-For questions about the datasets, methodologies, or bacterial species used in calculations, please refer to the specific model data directories or contact the challenge organizers.
